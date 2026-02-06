@@ -92,7 +92,23 @@ export const PaperAnalysisMode = ({ gemini, onBack }) => {
                             <div style={{ marginBottom: '16px' }}>
                                 <h4 style={{ fontSize: '1rem', color: '#fff', marginBottom: '8px' }}>Author Claims</h4>
                                 <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                                    {p.claims?.author_claims?.slice(0, 3).map((c, j) => <li key={j}>{c}</li>)}
+                                    {p.claims?.author_claims?.slice(0, 3).map((c, j) => (
+                                        <li key={j} style={{ marginBottom: '12px' }}>
+                                            <div>{typeof c === 'string' ? c : c.claim}</div>
+                                            {typeof c === 'object' && c.evidence && (
+                                                <div style={{
+                                                    fontSize: '0.8rem',
+                                                    color: 'var(--primary-neon)',
+                                                    marginTop: '6px',
+                                                    paddingLeft: '12px',
+                                                    borderLeft: '2px solid var(--primary-neon)',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    📍 {c.evidence}
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
 
@@ -100,8 +116,20 @@ export const PaperAnalysisMode = ({ gemini, onBack }) => {
                                 <h4 style={{ fontSize: '1rem', color: '#fff', marginBottom: '8px' }}>Limitations</h4>
                                 <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
                                     {p.limitations?.map((l, k) => (
-                                        <li key={k}>
-                                            <span style={{ color: 'var(--secondary-neon)' }}>{l.cause}:</span> {l.impact}
+                                        <li key={k} style={{ marginBottom: '12px' }}>
+                                            <span style={{ color: 'var(--secondary-neon)', fontWeight: 'bold' }}>{l.cause}:</span> {l.impact}
+                                            {l.evidence && (
+                                                <div style={{
+                                                    fontSize: '0.75rem',
+                                                    color: 'var(--primary-neon)',
+                                                    marginTop: '6px',
+                                                    paddingLeft: '12px',
+                                                    borderLeft: '2px solid var(--primary-neon)',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    📍 {l.evidence}
+                                                </div>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

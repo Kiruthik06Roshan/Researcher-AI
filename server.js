@@ -154,9 +154,24 @@ app.post('/api/paper/analyze', async (req, res) => {
         "type": "Original Research | Review | Conceptual",
         "type_justification": "...",
         "claims": {
-          "author_claims": ["..."],
-          "cited_claims": ["..."],
-          "analytical_observations": ["..."]
+          "author_claims": [
+            { 
+              "claim": "...", 
+              "evidence": "Evidence: Methodology section, Table 2 showing accuracy metrics"
+            }
+          ],
+          "cited_claims": [
+            { 
+              "claim": "...", 
+              "evidence": "Evidence: Introduction, citing Smith et al. (2020) on baseline performance"
+            }
+          ],
+          "analytical_observations": [
+            { 
+              "claim": "...", 
+              "evidence": "Evidence: Inferred from comparative analysis in Discussion section"
+            }
+          ]
         },
         "method_analysis": {
           "description": "...",
@@ -164,11 +179,156 @@ app.post('/api/paper/analyze', async (req, res) => {
           "experiments": "..."
         },
         "limitations": [
-          { "cause": "...", "impact": "...", "evidence": "..." }
+          { 
+            "cause": "Evaluation limited to static timetabling scenarios with fixed course enrollments",
+            "impact": "Method effectiveness in institutions with dynamic course reallocation and real-time enrollment changes remains unvalidated",
+            "evidence": "Evidence: Methodology section, experimental setup constraints"
+          }
         ],
         "gaps": ["Optional list of gaps if explicitly found"],
         "summary": "Brief 2-3 sentence summary of the paper."
       }
+
+      --------------------------------------------------
+      STEP 6: LIMITATION PRECISION ENFORCEMENT
+      --------------------------------------------------
+      When stating limitations, you must avoid abstract or high-level phrasing.
+
+      Every limitation MUST follow this structure:
+      - Context: What specific setting, assumption, or scope in the paper causes this limitation?
+      - Constraint: What exactly is restricted or simplified?
+      - Consequence: What kind of real-world, theoretical, or research applicability is affected?
+
+      ❌ Forbidden limitation phrasing:
+      - "may not generalize well"
+      - "scalability could be an issue"
+      - "performance depends on constraints"
+
+      ✅ Required limitation phrasing:
+      - Tie the limitation to a concrete design choice, dataset, evaluation setup, or assumption
+      - Use domain-specific language drawn from the paper
+      - Make the limitation falsifiable or testable
+
+      If a limitation cannot be grounded in the paper's logic or scope,
+      explicitly state: "No paper-specific limitation is identifiable for this aspect."
+
+      --------------------------------------------------
+      STEP 7: EVIDENCE ANCHORING FOR CLAIMS
+      --------------------------------------------------
+      For EVERY Author Claim and Analytical Observation, attach an evidence anchor.
+
+      Each anchor must specify at least ONE of the following:
+      - Section name (e.g., Introduction, Methodology, Discussion)
+      - Experimental component (e.g., fitness function design, constraint model)
+      - Citation behavior (e.g., synthesized from multiple referenced studies)
+
+      Format example for claims array:
+      "author_claims": [
+        {
+          "claim": "The proposed method achieves 95% accuracy",
+          "evidence": "Derived from Results section, Table 3"
+        }
+      ]
+
+      If the claim is inferential rather than explicit, label it clearly as:
+      "Inferred from [section/component]"
+
+      Claims without evidence anchors are NOT allowed.
+
+      --------------------------------------------------
+      STEP 8: CONFIDENCE CALIBRATION & ACADEMIC CAUTION
+      --------------------------------------------------
+      You must modulate confidence based on the strength of evidence.
+
+      Use the following language rules:
+
+      Use STRONG phrasing only when:
+      - Experimental validation is present
+      - Results are explicitly reported
+
+      Use CAUTIOUS phrasing when:
+      - The paper is a review or survey
+      - The claim is analytical or interpretive
+
+      Cautious phrasing includes:
+      - "The authors argue..."
+      - "The paper suggests..."
+      - "The review indicates..."
+      - "The analysis highlights..."
+
+      ❌ Forbidden overconfident verbs unless justified:
+      - demonstrates
+      - proves
+      - establishes definitively
+
+      If certainty level is mixed, prefer cautious phrasing by default.
+
+      --------------------------------------------------
+      STEP 9: FINAL SELF-CHECK (MANDATORY)
+      --------------------------------------------------
+      Before producing final output, internally verify:
+      1. No limitation is abstract or generic
+      2. Every claim has an evidence anchor
+      3. Confidence level matches paper type and evidence strength
+
+      If any condition fails, revise the output until all are satisfied.
+
+      --------------------------------------------------
+      STEP 10: EXPLICIT EVIDENCE ANCHORING (ELITE MODE)
+      --------------------------------------------------
+      For EVERY claim, observation, or limitation, you MUST attach an explicit evidence line.
+
+      Each evidence line must start with:
+      "Evidence:"
+
+      The evidence must reference at least ONE of the following:
+      - Section name (e.g., Introduction, Methodology, Discussion)
+      - Structural component (e.g., constraint modeling, fitness function design, evaluation setup)
+      - Review behavior (e.g., comparative synthesis of cited studies)
+
+      Examples:
+      - Evidence: Discussion section, based on comparative analysis of optimization methods.
+      - Evidence: Methodology section, derived from the fixed constraint modeling approach.
+      - Evidence: Review synthesis across multiple cited GA-based studies.
+
+      Claims or limitations WITHOUT an explicit "Evidence:" line are NOT allowed.
+
+      --------------------------------------------------
+      STEP 11: LIMITATION SHARPENING RULE
+      --------------------------------------------------
+      When stating a limitation, you MUST avoid vague nouns and abstract phrases.
+
+      ❌ Forbidden phrases:
+      - broader contexts
+      - real-world scenarios
+      - general environments
+      - wider applications
+
+      ✅ Required behavior:
+      - Replace abstract nouns with concrete institutional, technical, or operational entities.
+      - Specify *who*, *where*, or *under what condition* the limitation applies.
+
+      Each limitation MUST:
+      - Name a concrete setting (e.g., large public universities, dynamic scheduling systems)
+      - Specify the operational change that causes failure or restriction
+
+      Examples:
+      ❌ "This limits applicability in broader contexts."
+      ✅ "This limits applicability in institutions with dynamic course reallocation and real-time enrollment changes."
+
+      If a limitation cannot be sharpened without speculation, explicitly state:
+      "Limitation scope cannot be further specified without additional empirical data."
+
+      --------------------------------------------------
+      STEP 12: FINAL MICRO-QUALITY CHECK
+      --------------------------------------------------
+      Before finalizing output, verify internally:
+      1. Every claim has an explicit "Evidence:" line
+      2. No limitation contains abstract or vague nouns
+      3. All limitations reference concrete conditions or entities
+
+      If any check fails, revise until all conditions are satisfied.
+
       RETURN ONLY JSON.
     `;
 
