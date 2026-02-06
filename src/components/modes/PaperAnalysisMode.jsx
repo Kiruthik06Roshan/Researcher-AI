@@ -79,7 +79,39 @@ export const PaperAnalysisMode = ({ gemini, onBack }) => {
                     <h1>Analysis Report</h1>
                 </div>
 
-                {/* 1. Conflicts & Assumptions */}
+                {/* 1. Individual Paper Analysis Details */}
+                <h2 style={{ marginBottom: '24px' }}>Detailed Paper Analysis</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px', marginBottom: '60px' }}>
+                    {finalResult.papers.map((p, i) => (
+                        <div key={i} className="glass-panel" style={{ padding: '24px' }}>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--primary-neon)' }}>{p.filename}</h3>
+                            <div style={{ marginBottom: '16px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                                <strong>Type:</strong> {p.type}
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                                <h4 style={{ fontSize: '1rem', color: '#fff', marginBottom: '8px' }}>Author Claims</h4>
+                                <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                    {p.claims?.author_claims?.slice(0, 3).map((c, j) => <li key={j}>{c}</li>)}
+                                </ul>
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                                <h4 style={{ fontSize: '1rem', color: '#fff', marginBottom: '8px' }}>Limitations</h4>
+                                <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                    {p.limitations?.map((l, k) => (
+                                        <li key={k}>
+                                            <span style={{ color: 'var(--secondary-neon)' }}>{l.cause}:</span> {l.impact}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 2. Synthesis: Conflicts & Assumptions */}
+                <h2 style={{ marginBottom: '24px' }}>Synthesis & Gaps</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '40px' }}>
                     <div className="glass-panel" style={{ padding: '24px', borderColor: 'rgba(189, 0, 255, 0.3)' }}>
                         <h3 style={{ color: 'var(--secondary-neon)', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -100,13 +132,13 @@ export const PaperAnalysisMode = ({ gemini, onBack }) => {
                     </div>
                 </div>
 
-                {/* 2. Research Gap */}
+                {/* 3. Research Gap */}
                 <div className="glass-panel" style={{ padding: '32px', marginBottom: '40px', background: 'linear-gradient(180deg, rgba(20,20,30,0.8) 0%, rgba(30,30,50,0.8) 100%)' }}>
                     <h2 style={{ marginBottom: '16px' }}>Identified Research Gap</h2>
                     <p style={{ fontSize: '1.2rem', lineHeight: '1.6' }}>{finalResult.gap}</p>
                 </div>
 
-                {/* 3. Directions */}
+                {/* 4. Directions */}
                 <h2 style={{ marginBottom: '24px' }}>Recommended Directions</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '60px' }}>
                     {finalResult.directions?.map((dir, i) => (
@@ -123,7 +155,7 @@ export const PaperAnalysisMode = ({ gemini, onBack }) => {
                     ))}
                 </div>
 
-                {/* 4. Roadmap */}
+                {/* 5. Roadmap */}
                 <div className="glass-panel" style={{ padding: '40px' }}>
                     <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--primary-neon)' }}>
                         <Map /> Research Roadmap: {finalResult.roadmap.title}

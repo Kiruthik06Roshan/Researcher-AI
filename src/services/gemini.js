@@ -28,7 +28,10 @@ export class GeminiService {
       body: JSON.stringify({ text, filename })
     });
 
-    if (!response.ok) throw new Error("Paper Analysis Failed");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Paper Analysis Failed: ${response.statusText}`);
+    }
     return await response.json();
   }
 
