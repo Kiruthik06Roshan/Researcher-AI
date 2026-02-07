@@ -105,6 +105,70 @@ const FOCUS_AREAS = {
     ]
 };
 
+const DEFAULT_PATHWAYS = [
+    {
+        name: 'General Data Analysis',
+        description: 'Explore and visualize data to uncover insights and drive decision making.',
+        skills: ['Python', 'SQL', 'Tableau/PowerBI', 'Statistics'],
+        projects: [
+            { name: 'Public Dataset Explorer', description: 'Uncover trends in open health or climate data.', skills: ['Pandas', 'Plotly', 'Data Cleaning'] },
+            { name: 'Survey Result Analyzer', description: 'Extract meaningful conclusions from large scale feedback.', skills: ['SciPy', 'Qualitative Analysis', 'Matplotlib'] }
+        ]
+    },
+    {
+        name: 'Technical Research',
+        description: 'Deep dive into emerging technologies and their societal or industrial impact.',
+        skills: ['Literature Review', 'Comparative Analysis', 'Writing', 'Prototyping'],
+        projects: [
+            { name: 'Ethics in Tech Paper', description: 'Analyze the impact of AI on privacy or labor.', skills: ['Critical Thinking', 'Research Bias', 'Citations'] },
+            { name: 'Next-Gen Tech Survey', description: 'Compare competing technologies in a specific niche.', skills: ['Taxonomy', 'Market Analysis', 'Synthesis'] }
+        ]
+    },
+    {
+        name: 'Innovation & Design',
+        description: 'Apply human-centered design principles to solve complex technological problems.',
+        skills: ['UI/UX', 'Prototyping', 'User Interviews', 'Figma'],
+        projects: [
+            { name: 'Accessibility Audit', description: 'Redesign a service to be usable by everyone.', skills: ['WCAG', 'User Testing', 'Inclusivity'] },
+            { name: 'IoT Prototype Design', description: 'Conceptualize a physical-digital solution for community issues.', skills: ['Sketching', 'User Journeys', 'Constraints'] }
+        ]
+    }
+];
+
+const CORE_PROJECTS = [
+    {
+        name: 'Sentiment Analysis Bot',
+        description: 'Classify the emotional tone of text data to understand public opinion or customer feedback.',
+        skills: ['Python', 'NLP', 'NLTK', 'TextBlob']
+    },
+    {
+        name: 'Plant Disease Classifier',
+        description: 'Use image recognition to identify diseases in crops from smartphone photos.',
+        skills: ['Computer Vision', 'PyTorch/TensorFlow', 'Image Processing']
+    },
+    {
+        name: 'Traffic Flow Optimizer',
+        description: 'Analyze and predict traffic congestion to suggest optimal signal timings or routes.',
+        skills: ['Simulation', 'Graph Theory', 'Data Analysis']
+    },
+    {
+        name: 'Personalized Movie Recommender',
+        description: 'Build a recommendation engine based on user preferences and viewing history.',
+        skills: ['Collaborative Filtering', 'Pandas', 'Matrix Factorization']
+    },
+    {
+        name: 'Autonomous Drone Pathfinding',
+        description: 'Simulate pathfinding algorithms for drones navigating complex 3D environments.',
+        skills: ['Algorithms', 'Geometry', 'Physics Simulation']
+    },
+    {
+        name: 'Air Quality Impact Study',
+        description: 'Analyze correlation between industrial activity and local air quality indices.',
+        skills: ['Data Visualization', 'Environmental Science', 'Statistics']
+    }
+];
+
+
 export const BeginnerMode = ({ gemini, onBack }) => {
     const [step, setStep] = useState('input'); // input | loading | dashboard | roadmap-loading | roadmap
     const [formData, setFormData] = useState({
@@ -595,8 +659,7 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                             value={formData.interest}
                             onChange={(e) => setFormData({
                                 ...formData,
-                                interest: e.target.value,
-                                focusArea: 'None - Keep it broad' // Reset focus area when interest changes
+                                interest: e.target.value
                             })}
                             style={{ width: '100%' }}
                         >
