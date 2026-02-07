@@ -34,158 +34,76 @@ const LEVELS = [
     'Advanced/Expert'
 ];
 
-const DOMAIN_DATA = {
+// Optional focus areas for each interest (beginner-friendly)
+const FOCUS_AREAS = {
     'Artificial Intelligence & Machine Learning': [
-        {
-            name: 'Time Series Forecasting',
-            description: 'Analyze historical patterns to predict future trends in sequential data like stocks, weather, or energy consumption.',
-            skills: ['Python', 'Statistics', 'Pandas', 'ARIMA/LSTM'],
-            projects: [
-                { name: 'Stock Market Trend Predictor', description: 'Predict price movements using historical data.', skills: ['Python', 'Pandas', 'Statsmodels'] },
-                { name: 'Energy Consumption Forecast', description: 'Analyze power usage patterns for urban planning.', skills: ['Python', 'Matplotlib', 'LSTM'] }
-            ]
-        },
-        {
-            name: 'Anomaly Detection',
-            description: 'Identify unusual patterns that do not conform to expected behavior, critical for fraud detection and system health.',
-            skills: ['Machine Learning', 'Data Cleaning', 'Scikit-learn', 'PyOD'],
-            projects: [
-                { name: 'Credit Card Fraud Detector', description: 'Spot fraudulent transactions in real-time.', skills: ['Scikit-learn', 'Imbalanced Data', 'Logistical Regression'] },
-                { name: 'Server Health Monitor', description: 'Identify unusual server behavior before failures occur.', skills: ['Anomaly Detection', 'Grafana', 'ElasticSearch'] }
-            ]
-        },
-        {
-            name: 'Predictive Modeling',
-            description: 'Build mathematical models to predict outcomes based on diverse input variables and historical relationships.',
-            skills: ['Regressions', 'Decision Trees', 'Feature Engineering', 'XGBoost'],
-            projects: [
-                { name: 'Housing Price Estimator', description: 'Predict real estate values based on local features.', skills: ['Regression', 'NumPy', 'Visualization'] },
-                { name: 'Patient Outcome Predictor', description: 'Estimate recovery times based on clinical data.', skills: ['Health Informatics', 'XGBoost', 'Feature Engineering'] }
-            ]
-        }
+        'None - Keep it broad',
+        'Computer Vision & Image Recognition',
+        'Natural Language & Chatbots',
+        'Recommendation Systems',
+        'Predictive Analytics',
+        'Robotics & Automation'
     ],
-    'Web Development': [
-        {
-            name: 'Frontend Architecture',
-            description: 'Design and build scalable, performant user interfaces using modern frameworks and design patterns.',
-            skills: ['React', 'Next.js', 'TypeScript', 'Performance Optimization'],
-            projects: [
-                { name: 'Component Library Creator', description: 'Build a reusable UI system for large-scale apps.', skills: ['Storybook', 'Tailwind', 'Accessibility'] },
-                { name: 'SaaS Dashboard', description: 'Build a complex data-driven admin panel.', skills: ['React Query', 'Charts.js', 'Dynamic Layouts'] }
-            ]
-        },
-        {
-            name: 'Backend Scalability',
-            description: 'Develop robust server-side systems capable of handling millions of requests and massive data sets.',
-            skills: ['Node.js', 'Go', 'Microservices', 'Redis'],
-            projects: [
-                { name: 'Real-time Chat Engine', description: 'Build a low-latency messaging system.', skills: ['WebSockets', 'Socket.io', 'Redis'] },
-                { name: 'High-Throughput API', description: 'Optimize REST/GraphQL endpoints for scale.', skills: ['Load Balancing', 'Caching', 'Database Indexing'] }
-            ]
-        },
-        {
-            name: 'State Management',
-            description: 'Master complex data flows and synchronization across large distributed web applications.',
-            skills: ['Redux', 'Zustand', 'Context API', 'Server State'],
-            projects: [
-                { name: 'E-commerce Cart Logic', description: 'Handle complex persistent state across sessions.', skills: ['Redux Toolkit', 'Local Storage', 'Synching'] },
-                { name: 'Collaborative Editor', description: 'Manage real-time state sync between multiple users.', skills: ['Yjs', 'CRDTs', 'State Machines'] }
-            ]
-        }
+    'Environment & Climate Change': [
+        'None - Keep it broad',
+        'Air Quality Monitoring',
+        'Water Conservation',
+        'Renewable Energy',
+        'Wildlife & Biodiversity',
+        'Sustainable Agriculture'
     ],
-    'Cybersecurity': [
-        {
-            name: 'Network Defense',
-            description: 'Protect institutional computer networks from unauthorized access and malicious activity.',
-            skills: ['Networking', 'Firewalls', 'IDS/IPS', 'Wireshark'],
-            projects: [
-                { name: 'Intrusion Detection System', description: 'Build a tool to flag suspicious network traffic.', skills: ['Python', 'Packet Analysis', 'Snort'] },
-                { name: 'VPN Gateway Architect', description: 'Secure remote access points for distributed teams.', skills: ['OpenVPN', 'Encryption', 'Routing'] }
-            ]
-        },
-        {
-            name: 'Cryptography',
-            description: 'Master the mathematical foundations and practical implementations of secure communication.',
-            skills: ['RSA/AES', 'Hashing', 'Zero-Knowledge Proofs', 'Blockchain'],
-            projects: [
-                { name: 'Secure File Vault', description: 'Build an end-to-end encrypted storage solution.', skills: ['Web Crypto API', 'Key Management', 'Salting'] },
-                { name: 'Digital Signature Tool', description: 'Verify document authenticity using public-key crypto.', skills: ['OpenSSL', 'X.509', 'PKI'] }
-            ]
-        },
-        {
-            name: 'Ethical Hacking',
-            description: 'Proactively identify and patch vulnerabilities by thinking like an adversary.',
-            skills: ['Metasploit', 'SQL Injection', 'Penetration Testing', 'Nmap'],
-            projects: [
-                { name: 'Vulnerability Scanner', description: 'Automate security checks on web applications.', skills: ['OWASP Zap', 'Python', 'Scripting'] },
-                { name: 'Bug Bounty Toolkit', description: 'Assemble a set of tools for systematic exploit hunting.', skills: ['Burp Suite', 'Fuzzing', 'Social Engineering'] }
-            ]
-        }
+    'Healthcare & Medicine': [
+        'None - Keep it broad',
+        'Disease Diagnosis',
+        'Drug Discovery',
+        'Patient Monitoring',
+        'Mental Health',
+        'Medical Imaging'
+    ],
+    'Technology & Innovation': [
+        'None - Keep it broad',
+        'Mobile Apps',
+        'Web Development',
+        'Cybersecurity',
+        'Cloud Computing',
+        'Blockchain'
+    ],
+    'Education & Learning': [
+        'None - Keep it broad',
+        'Online Learning Platforms',
+        'Educational Games',
+        'Student Performance',
+        'Accessibility Tools',
+        'Language Learning'
+    ],
+    'Social Good & Community': [
+        'None - Keep it broad',
+        'Disaster Response',
+        'Poverty Reduction',
+        'Community Safety',
+        'Accessibility',
+        'Social Justice'
+    ],
+    'Business & Economics': [
+        'None - Keep it broad',
+        'Market Analysis',
+        'Customer Behavior',
+        'Financial Forecasting',
+        'Supply Chain',
+        'E-commerce'
+    ],
+    'Science & Research': [
+        'None - Keep it broad',
+        'Data Analysis',
+        'Experimental Design',
+        'Scientific Visualization',
+        'Lab Automation',
+        'Research Tools'
+    ],
+    'Other (Custom)': [
+        'None - Keep it broad'
     ]
 };
-
-const DEFAULT_PATHWAYS = [
-    {
-        name: 'General Data Analysis',
-        description: 'Explore and visualize data to uncover insights and drive decision making.',
-        skills: ['Python', 'SQL', 'Tableau/PowerBI', 'Statistics'],
-        projects: [
-            { name: 'Public Dataset Explorer', description: 'Uncover trends in open health or climate data.', skills: ['Pandas', 'Plotly', 'Data Cleaning'] },
-            { name: 'Survey Result Analyzer', description: 'Extract meaningful conclusions from large scale feedback.', skills: ['SciPy', 'Qualitative Analysis', 'Matplotlib'] }
-        ]
-    },
-    {
-        name: 'Technical Research',
-        description: 'Deep dive into emerging technologies and their societal or industrial impact.',
-        skills: ['Literature Review', 'Comparative Analysis', 'Writing', 'Prototyping'],
-        projects: [
-            { name: 'Ethics in Tech Paper', description: 'Analyze the impact of AI on privacy or labor.', skills: ['Critical Thinking', 'Research Bias', 'Citations'] },
-            { name: 'Next-Gen Tech Survey', description: 'Compare competing technologies in a specific niche.', skills: ['Taxonomy', 'Market Analysis', 'Synthesis'] }
-        ]
-    },
-    {
-        name: 'Innovation & Design',
-        description: 'Apply human-centered design principles to solve complex technological problems.',
-        skills: ['UI/UX', 'Prototyping', 'User Interviews', 'Figma'],
-        projects: [
-            { name: 'Accessibility Audit', description: 'Redesign a service to be usable by everyone.', skills: ['WCAG', 'User Testing', 'Inclusivity'] },
-            { name: 'IoT Prototype Design', description: 'Conceptualize a physical-digital solution for community issues.', skills: ['Sketching', 'User Journeys', 'Constraints'] }
-        ]
-    }
-];
-
-const CORE_PROJECTS = [
-    {
-        name: 'Sentiment Analysis Bot',
-        description: 'Classify the emotional tone of text data to understand public opinion or customer feedback.',
-        skills: ['Python', 'NLP', 'NLTK', 'TextBlob']
-    },
-    {
-        name: 'Plant Disease Classifier',
-        description: 'Use image recognition to identify diseases in crops from smartphone photos.',
-        skills: ['Computer Vision', 'PyTorch/TensorFlow', 'Image Processing']
-    },
-    {
-        name: 'Traffic Flow Optimizer',
-        description: 'Analyze and predict traffic congestion to suggest optimal signal timings or routes.',
-        skills: ['Simulation', 'Graph Theory', 'Data Analysis']
-    },
-    {
-        name: 'Personalized Movie Recommender',
-        description: 'Build a recommendation engine based on user preferences and viewing history.',
-        skills: ['Collaborative Filtering', 'Pandas', 'Matrix Factorization']
-    },
-    {
-        name: 'Autonomous Drone Pathfinding',
-        description: 'Simulate pathfinding algorithms for drones navigating complex 3D environments.',
-        skills: ['Algorithms', 'Geometry', 'Physics Simulation']
-    },
-    {
-        name: 'Air Quality Impact Study',
-        description: 'Analyze correlation between industrial activity and local air quality indices.',
-        skills: ['Data Visualization', 'Environmental Science', 'Statistics']
-    }
-];
 
 export const BeginnerMode = ({ gemini, onBack }) => {
     const [step, setStep] = useState('input'); // input | loading | dashboard | roadmap-loading | roadmap
@@ -193,6 +111,7 @@ export const BeginnerMode = ({ gemini, onBack }) => {
         interest: INTERESTS[0],
         type: DATA_TYPES[0],
         level: LEVELS[0],
+        focusArea: 'None - Keep it broad', // Optional inner domain
         customInterest: '',
         customType: ''
     });
@@ -674,7 +593,11 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                         </p>
                         <select
                             value={formData.interest}
-                            onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                            onChange={(e) => setFormData({
+                                ...formData,
+                                interest: e.target.value,
+                                focusArea: 'None - Keep it broad' // Reset focus area when interest changes
+                            })}
                             style={{ width: '100%' }}
                         >
                             {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
@@ -698,6 +621,39 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                             />
                         )}
                     </div>
+
+                    {/* Focus Area (Optional Inner Domain) */}
+                    {!isCustomInterest && (
+                        <div>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--text-primary)', fontWeight: '500' }}>
+                                <Target size={18} color="var(--primary-neon)" />
+                                Want to focus on something specific? (Optional)
+                            </label>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                                You can pick a focus area if you want, or keep it broad - it's totally up to you!
+                            </p>
+                            <select
+                                value={formData.focusArea}
+                                onChange={(e) => setFormData({ ...formData, focusArea: e.target.value })}
+                                style={{ width: '100%' }}
+                            >
+                                {FOCUS_AREAS[formData.interest].map(f => <option key={f} value={f}>{f}</option>)}
+                            </select>
+                            {formData.focusArea !== 'None - Keep it broad' && (
+                                <div style={{
+                                    marginTop: '12px',
+                                    padding: '12px',
+                                    background: 'rgba(0, 242, 255, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(0, 242, 255, 0.2)',
+                                    fontSize: '0.85rem',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    ✓ Great! We'll personalize suggestions for <b style={{ color: 'var(--primary-neon)' }}>{formData.focusArea}</b>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Data Type */}
                     <div>
