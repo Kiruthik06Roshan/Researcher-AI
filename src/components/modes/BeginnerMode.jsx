@@ -32,12 +32,84 @@ const LEVELS = [
     'Advanced/Expert'
 ];
 
+// Optional focus areas for each interest (beginner-friendly)
+const FOCUS_AREAS = {
+    'Artificial Intelligence & Machine Learning': [
+        'None - Keep it broad',
+        'Computer Vision & Image Recognition',
+        'Natural Language & Chatbots',
+        'Recommendation Systems',
+        'Predictive Analytics',
+        'Robotics & Automation'
+    ],
+    'Environment & Climate Change': [
+        'None - Keep it broad',
+        'Air Quality Monitoring',
+        'Water Conservation',
+        'Renewable Energy',
+        'Wildlife & Biodiversity',
+        'Sustainable Agriculture'
+    ],
+    'Healthcare & Medicine': [
+        'None - Keep it broad',
+        'Disease Diagnosis',
+        'Drug Discovery',
+        'Patient Monitoring',
+        'Mental Health',
+        'Medical Imaging'
+    ],
+    'Technology & Innovation': [
+        'None - Keep it broad',
+        'Mobile Apps',
+        'Web Development',
+        'Cybersecurity',
+        'Cloud Computing',
+        'Blockchain'
+    ],
+    'Education & Learning': [
+        'None - Keep it broad',
+        'Online Learning Platforms',
+        'Educational Games',
+        'Student Performance',
+        'Accessibility Tools',
+        'Language Learning'
+    ],
+    'Social Good & Community': [
+        'None - Keep it broad',
+        'Disaster Response',
+        'Poverty Reduction',
+        'Community Safety',
+        'Accessibility',
+        'Social Justice'
+    ],
+    'Business & Economics': [
+        'None - Keep it broad',
+        'Market Analysis',
+        'Customer Behavior',
+        'Financial Forecasting',
+        'Supply Chain',
+        'E-commerce'
+    ],
+    'Science & Research': [
+        'None - Keep it broad',
+        'Data Analysis',
+        'Experimental Design',
+        'Scientific Visualization',
+        'Lab Automation',
+        'Research Tools'
+    ],
+    'Other (Custom)': [
+        'None - Keep it broad'
+    ]
+};
+
 export const BeginnerMode = ({ gemini, onBack }) => {
     const [step, setStep] = useState('input'); // input | loading | results | project-selection | roadmap-loading | roadmap
     const [formData, setFormData] = useState({
         interest: INTERESTS[0],
         type: DATA_TYPES[0],
         level: LEVELS[0],
+        focusArea: 'None - Keep it broad', // Optional inner domain
         customInterest: '',
         customType: ''
     });
@@ -431,7 +503,11 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                         </p>
                         <select
                             value={formData.interest}
-                            onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                            onChange={(e) => setFormData({
+                                ...formData,
+                                interest: e.target.value,
+                                focusArea: 'None - Keep it broad' // Reset focus area when interest changes
+                            })}
                             style={{ width: '100%' }}
                         >
                             {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
@@ -455,6 +531,39 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                             />
                         )}
                     </div>
+
+                    {/* Focus Area (Optional Inner Domain) */}
+                    {!isCustomInterest && (
+                        <div>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--text-primary)', fontWeight: '500' }}>
+                                <Target size={18} color="var(--primary-neon)" />
+                                Want to focus on something specific? (Optional)
+                            </label>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                                You can pick a focus area if you want, or keep it broad - it's totally up to you!
+                            </p>
+                            <select
+                                value={formData.focusArea}
+                                onChange={(e) => setFormData({ ...formData, focusArea: e.target.value })}
+                                style={{ width: '100%' }}
+                            >
+                                {FOCUS_AREAS[formData.interest].map(f => <option key={f} value={f}>{f}</option>)}
+                            </select>
+                            {formData.focusArea !== 'None - Keep it broad' && (
+                                <div style={{
+                                    marginTop: '12px',
+                                    padding: '12px',
+                                    background: 'rgba(0, 242, 255, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(0, 242, 255, 0.2)',
+                                    fontSize: '0.85rem',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    ✓ Great! We'll personalize suggestions for <b style={{ color: 'var(--primary-neon)' }}>{formData.focusArea}</b>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Data Type */}
                     <div>
