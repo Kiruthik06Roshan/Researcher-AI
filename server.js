@@ -28,9 +28,37 @@ console.log("DEBUG: Strict Mode - Loaded Models:", MODELS);
 // Init default model
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-// Helper to remove Markdown formatting from JSON response
+// Helper to remove Markdown formatting and extract JSON from response
 const cleanJson = (text) => {
-  return text.replace(/```json/g, '').replace(/```/g, '').trim();
+  // Remove markdown code blocks
+  let cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+  // Try to find JSON object or array
+  // Look for the first { or [ and the last } or ]
+  const firstBrace = cleaned.indexOf('{');
+  const firstBracket = cleaned.indexOf('[');
+  const lastBrace = cleaned.lastIndexOf('}');
+  const lastBracket = cleaned.lastIndexOf(']');
+
+  // Determine if it's an object or array
+  let start = -1;
+  let end = -1;
+
+  if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+    // It's an object
+    start = firstBrace;
+    end = lastBrace + 1;
+  } else if (firstBracket !== -1) {
+    // It's an array
+    start = firstBracket;
+    end = lastBracket + 1;
+  }
+
+  if (start !== -1 && end !== -1) {
+    return cleaned.substring(start, end);
+  }
+
+  return cleaned;
 };
 
 // Helper for rate limits & model fallbacks
@@ -112,6 +140,101 @@ app.post('/api/beginner', async (req, res) => {
     res.status(500).json({ error: "AI Service Error: " + error.message });
   }
 });
+
+// Route: Beginner Mode - Project Roadmap (Elite Mentor)
+app.post('/api/beginner/roadmap', async (req, res) => {
+  try {
+    const { project, interest, dataType, level } = req.body;
+
+    // CRITICAL GATING: Project must be provided
+    if (!project || project.trim() === '') {
+      return res.status(400).json({ error: "Project selection is required for roadmap generation" });
+    }
+
+    console.log(`DEBUG: Roadmap API Call - Project: ${project}, Level: ${level}`);
+
+    const prompt = `
+      You are an ELITE MENTOR guiding a ${level} beginner through their research journey.
+      
+      The user has selected this project: "${project}"
+      Their interest area: ${interest}
+      Data type: ${dataType}
+      Skill level: ${level}
+
+      CRITICAL RULES:
+      - You are a MENTOR, NOT a reviewer or evaluator
+      - Use beginner-friendly but elite-quality guidance
+      - Focus on understanding and execution, NOT evaluation
+      - NEVER use words like: methodology, evaluation, evidence, novelty, experiments, metrics, paper sections, research gaps
+      - Use mentor phrases like: "At this stage, focus on...", "A strong beginner should understand...", "An important mistake to avoid is..."
+
+      YOUR TASK:
+      Generate a comprehensive 6-PHASE ROADMAP for this project.
+
+      PHASE 1: Project Understanding
+      - Explain the project clearly and intuitively
+      - Explain why it matters in the real world
+      - Define what success looks like
+      - Build the correct mental model
+
+      PHASE 2: Core Concepts Mastery
+      - Identify essential concepts the user MUST understand
+      - Explain how these concepts connect to the project
+      - Emphasize understanding over memorization
+
+      PHASE 3: Data & Resources Understanding
+      - Explain what type of data is commonly used
+      - How beginners typically access or create such data
+      - Explain what "good enough" data means at this stage
+
+      PHASE 4: First Practical Build
+      - Guide the user to build a small, simple version
+      - Emphasize learning-by-doing
+      - Warn clearly against overengineering
+
+      PHASE 5: Reflection & Improvement
+      - Teach the user how to reflect on their work
+      - Highlight common beginner mistakes
+      - Suggest meaningful and achievable improvements
+
+      PHASE 6: Growth Path Forward
+      - Explain how the project can evolve
+      - Suggest skills to learn next
+      - Connect this project to future advanced work
+
+      OUTPUT JSON FORMAT:
+      {
+        "overview": "Brief 2-3 sentence overview of the project journey",
+        "phases": [
+          {
+            "title": "Phase 1: Project Understanding",
+            "objective": "Clear objective of this phase",
+            "whatToDo": "Detailed explanation of what to learn and do",
+            "mentorGuidance": "Practical mentoring guidance - what to focus on, what to avoid",
+            "outcome": "How the user knows they completed this phase"
+          },
+          ... (6 phases total)
+        ]
+      }
+
+      TONE: Calm, confident mentor. Encouraging and supportive.
+      LANGUAGE: Clear and beginner-friendly but not shallow.
+      
+      RETURN ONLY JSON.
+    `;
+
+    const result = await generateWithRetry(model, prompt);
+    const response = await result.response;
+    const text = response.text();
+    const json = JSON.parse(cleanJson(text));
+    res.json(json);
+
+  } catch (error) {
+    console.error("Roadmap Generation Error:", error.message);
+    res.status(500).json({ error: "AI Service Error: " + error.message });
+  }
+});
+
 
 // Route: Paper Analysis (Step 1)
 app.post('/api/paper/analyze', async (req, res) => {

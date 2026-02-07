@@ -20,6 +20,21 @@ export class GeminiService {
     return await response.json();
   }
 
+  // MODE 1: Project Roadmap (Elite Mentor)
+  async getProjectRoadmap(data) {
+    const response = await fetch(`${this.baseUrl}/beginner/roadmap`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Roadmap Generation Failed: ${response.statusText}`);
+    }
+    return await response.json();
+  }
+
   // MODE 2: Paper Analysis (Step 1)
   async analyzePaper(text, filename) {
     const response = await fetch(`${this.baseUrl}/paper/analyze`, {
