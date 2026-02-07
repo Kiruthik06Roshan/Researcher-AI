@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, BookOpen, Star, Zap, HelpCircle, Lightbulb, Target, CheckCircle, AlertCircle, TrendingUp, RefreshCw } from 'lucide-react';
+import { Sparkles, ArrowRight, BookOpen, Star, Zap, HelpCircle, Lightbulb, Target, CheckCircle, AlertCircle, TrendingUp, RefreshCw, Eye, X } from 'lucide-react';
 
 // Enhanced dropdown options with more variety
 const INTERESTS = [
     'Artificial Intelligence & Machine Learning',
+    'Web Development',
+    'Cybersecurity',
     'Environment & Climate Change',
     'Healthcare & Medicine',
     'Technology & Innovation',
@@ -32,90 +34,174 @@ const LEVELS = [
     'Advanced/Expert'
 ];
 
-// Optional focus areas for each interest (beginner-friendly)
-const FOCUS_AREAS = {
+const DOMAIN_DATA = {
     'Artificial Intelligence & Machine Learning': [
-        'None - Keep it broad',
-        'Computer Vision & Image Recognition',
-        'Natural Language & Chatbots',
-        'Recommendation Systems',
-        'Predictive Analytics',
-        'Robotics & Automation'
+        {
+            name: 'Time Series Forecasting',
+            description: 'Analyze historical patterns to predict future trends in sequential data like stocks, weather, or energy consumption.',
+            skills: ['Python', 'Statistics', 'Pandas', 'ARIMA/LSTM'],
+            projects: [
+                { name: 'Stock Market Trend Predictor', description: 'Predict price movements using historical data.', skills: ['Python', 'Pandas', 'Statsmodels'] },
+                { name: 'Energy Consumption Forecast', description: 'Analyze power usage patterns for urban planning.', skills: ['Python', 'Matplotlib', 'LSTM'] }
+            ]
+        },
+        {
+            name: 'Anomaly Detection',
+            description: 'Identify unusual patterns that do not conform to expected behavior, critical for fraud detection and system health.',
+            skills: ['Machine Learning', 'Data Cleaning', 'Scikit-learn', 'PyOD'],
+            projects: [
+                { name: 'Credit Card Fraud Detector', description: 'Spot fraudulent transactions in real-time.', skills: ['Scikit-learn', 'Imbalanced Data', 'Logistical Regression'] },
+                { name: 'Server Health Monitor', description: 'Identify unusual server behavior before failures occur.', skills: ['Anomaly Detection', 'Grafana', 'ElasticSearch'] }
+            ]
+        },
+        {
+            name: 'Predictive Modeling',
+            description: 'Build mathematical models to predict outcomes based on diverse input variables and historical relationships.',
+            skills: ['Regressions', 'Decision Trees', 'Feature Engineering', 'XGBoost'],
+            projects: [
+                { name: 'Housing Price Estimator', description: 'Predict real estate values based on local features.', skills: ['Regression', 'NumPy', 'Visualization'] },
+                { name: 'Patient Outcome Predictor', description: 'Estimate recovery times based on clinical data.', skills: ['Health Informatics', 'XGBoost', 'Feature Engineering'] }
+            ]
+        }
     ],
-    'Environment & Climate Change': [
-        'None - Keep it broad',
-        'Air Quality Monitoring',
-        'Water Conservation',
-        'Renewable Energy',
-        'Wildlife & Biodiversity',
-        'Sustainable Agriculture'
+    'Web Development': [
+        {
+            name: 'Frontend Architecture',
+            description: 'Design and build scalable, performant user interfaces using modern frameworks and design patterns.',
+            skills: ['React', 'Next.js', 'TypeScript', 'Performance Optimization'],
+            projects: [
+                { name: 'Component Library Creator', description: 'Build a reusable UI system for large-scale apps.', skills: ['Storybook', 'Tailwind', 'Accessibility'] },
+                { name: 'SaaS Dashboard', description: 'Build a complex data-driven admin panel.', skills: ['React Query', 'Charts.js', 'Dynamic Layouts'] }
+            ]
+        },
+        {
+            name: 'Backend Scalability',
+            description: 'Develop robust server-side systems capable of handling millions of requests and massive data sets.',
+            skills: ['Node.js', 'Go', 'Microservices', 'Redis'],
+            projects: [
+                { name: 'Real-time Chat Engine', description: 'Build a low-latency messaging system.', skills: ['WebSockets', 'Socket.io', 'Redis'] },
+                { name: 'High-Throughput API', description: 'Optimize REST/GraphQL endpoints for scale.', skills: ['Load Balancing', 'Caching', 'Database Indexing'] }
+            ]
+        },
+        {
+            name: 'State Management',
+            description: 'Master complex data flows and synchronization across large distributed web applications.',
+            skills: ['Redux', 'Zustand', 'Context API', 'Server State'],
+            projects: [
+                { name: 'E-commerce Cart Logic', description: 'Handle complex persistent state across sessions.', skills: ['Redux Toolkit', 'Local Storage', 'Synching'] },
+                { name: 'Collaborative Editor', description: 'Manage real-time state sync between multiple users.', skills: ['Yjs', 'CRDTs', 'State Machines'] }
+            ]
+        }
     ],
-    'Healthcare & Medicine': [
-        'None - Keep it broad',
-        'Disease Diagnosis',
-        'Drug Discovery',
-        'Patient Monitoring',
-        'Mental Health',
-        'Medical Imaging'
-    ],
-    'Technology & Innovation': [
-        'None - Keep it broad',
-        'Mobile Apps',
-        'Web Development',
-        'Cybersecurity',
-        'Cloud Computing',
-        'Blockchain'
-    ],
-    'Education & Learning': [
-        'None - Keep it broad',
-        'Online Learning Platforms',
-        'Educational Games',
-        'Student Performance',
-        'Accessibility Tools',
-        'Language Learning'
-    ],
-    'Social Good & Community': [
-        'None - Keep it broad',
-        'Disaster Response',
-        'Poverty Reduction',
-        'Community Safety',
-        'Accessibility',
-        'Social Justice'
-    ],
-    'Business & Economics': [
-        'None - Keep it broad',
-        'Market Analysis',
-        'Customer Behavior',
-        'Financial Forecasting',
-        'Supply Chain',
-        'E-commerce'
-    ],
-    'Science & Research': [
-        'None - Keep it broad',
-        'Data Analysis',
-        'Experimental Design',
-        'Scientific Visualization',
-        'Lab Automation',
-        'Research Tools'
-    ],
-    'Other (Custom)': [
-        'None - Keep it broad'
+    'Cybersecurity': [
+        {
+            name: 'Network Defense',
+            description: 'Protect institutional computer networks from unauthorized access and malicious activity.',
+            skills: ['Networking', 'Firewalls', 'IDS/IPS', 'Wireshark'],
+            projects: [
+                { name: 'Intrusion Detection System', description: 'Build a tool to flag suspicious network traffic.', skills: ['Python', 'Packet Analysis', 'Snort'] },
+                { name: 'VPN Gateway Architect', description: 'Secure remote access points for distributed teams.', skills: ['OpenVPN', 'Encryption', 'Routing'] }
+            ]
+        },
+        {
+            name: 'Cryptography',
+            description: 'Master the mathematical foundations and practical implementations of secure communication.',
+            skills: ['RSA/AES', 'Hashing', 'Zero-Knowledge Proofs', 'Blockchain'],
+            projects: [
+                { name: 'Secure File Vault', description: 'Build an end-to-end encrypted storage solution.', skills: ['Web Crypto API', 'Key Management', 'Salting'] },
+                { name: 'Digital Signature Tool', description: 'Verify document authenticity using public-key crypto.', skills: ['OpenSSL', 'X.509', 'PKI'] }
+            ]
+        },
+        {
+            name: 'Ethical Hacking',
+            description: 'Proactively identify and patch vulnerabilities by thinking like an adversary.',
+            skills: ['Metasploit', 'SQL Injection', 'Penetration Testing', 'Nmap'],
+            projects: [
+                { name: 'Vulnerability Scanner', description: 'Automate security checks on web applications.', skills: ['OWASP Zap', 'Python', 'Scripting'] },
+                { name: 'Bug Bounty Toolkit', description: 'Assemble a set of tools for systematic exploit hunting.', skills: ['Burp Suite', 'Fuzzing', 'Social Engineering'] }
+            ]
+        }
     ]
 };
 
+const DEFAULT_PATHWAYS = [
+    {
+        name: 'General Data Analysis',
+        description: 'Explore and visualize data to uncover insights and drive decision making.',
+        skills: ['Python', 'SQL', 'Tableau/PowerBI', 'Statistics'],
+        projects: [
+            { name: 'Public Dataset Explorer', description: 'Uncover trends in open health or climate data.', skills: ['Pandas', 'Plotly', 'Data Cleaning'] },
+            { name: 'Survey Result Analyzer', description: 'Extract meaningful conclusions from large scale feedback.', skills: ['SciPy', 'Qualitative Analysis', 'Matplotlib'] }
+        ]
+    },
+    {
+        name: 'Technical Research',
+        description: 'Deep dive into emerging technologies and their societal or industrial impact.',
+        skills: ['Literature Review', 'Comparative Analysis', 'Writing', 'Prototyping'],
+        projects: [
+            { name: 'Ethics in Tech Paper', description: 'Analyze the impact of AI on privacy or labor.', skills: ['Critical Thinking', 'Research Bias', 'Citations'] },
+            { name: 'Next-Gen Tech Survey', description: 'Compare competing technologies in a specific niche.', skills: ['Taxonomy', 'Market Analysis', 'Synthesis'] }
+        ]
+    },
+    {
+        name: 'Innovation & Design',
+        description: 'Apply human-centered design principles to solve complex technological problems.',
+        skills: ['UI/UX', 'Prototyping', 'User Interviews', 'Figma'],
+        projects: [
+            { name: 'Accessibility Audit', description: 'Redesign a service to be usable by everyone.', skills: ['WCAG', 'User Testing', 'Inclusivity'] },
+            { name: 'IoT Prototype Design', description: 'Conceptualize a physical-digital solution for community issues.', skills: ['Sketching', 'User Journeys', 'Constraints'] }
+        ]
+    }
+];
+
+const CORE_PROJECTS = [
+    {
+        name: 'Sentiment Analysis Bot',
+        description: 'Classify the emotional tone of text data to understand public opinion or customer feedback.',
+        skills: ['Python', 'NLP', 'NLTK', 'TextBlob']
+    },
+    {
+        name: 'Plant Disease Classifier',
+        description: 'Use image recognition to identify diseases in crops from smartphone photos.',
+        skills: ['Computer Vision', 'PyTorch/TensorFlow', 'Image Processing']
+    },
+    {
+        name: 'Traffic Flow Optimizer',
+        description: 'Analyze and predict traffic congestion to suggest optimal signal timings or routes.',
+        skills: ['Simulation', 'Graph Theory', 'Data Analysis']
+    },
+    {
+        name: 'Personalized Movie Recommender',
+        description: 'Build a recommendation engine based on user preferences and viewing history.',
+        skills: ['Collaborative Filtering', 'Pandas', 'Matrix Factorization']
+    },
+    {
+        name: 'Autonomous Drone Pathfinding',
+        description: 'Simulate pathfinding algorithms for drones navigating complex 3D environments.',
+        skills: ['Algorithms', 'Geometry', 'Physics Simulation']
+    },
+    {
+        name: 'Air Quality Impact Study',
+        description: 'Analyze correlation between industrial activity and local air quality indices.',
+        skills: ['Data Visualization', 'Environmental Science', 'Statistics']
+    }
+];
+
+
 export const BeginnerMode = ({ gemini, onBack }) => {
-    const [step, setStep] = useState('input'); // input | loading | results | project-selection | roadmap-loading | roadmap
+    const [step, setStep] = useState('input'); // input | loading | dashboard | roadmap-loading | roadmap
     const [formData, setFormData] = useState({
         interest: INTERESTS[0],
         type: DATA_TYPES[0],
         level: LEVELS[0],
-        focusArea: 'None - Keep it broad', // Optional inner domain
         customInterest: '',
         customType: ''
     });
     const [results, setResults] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
     const [roadmap, setRoadmap] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalProject, setModalProject] = useState(null);
 
     // Check if "Other" is selected
     const isCustomInterest = formData.interest === 'Other (Custom)';
@@ -142,14 +228,20 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                 level: formData.level
             });
             setResults(data);
-            setStep('results');
+            setStep('dashboard');
         } catch (e) {
-            alert("AI Error: " + e.message);
-            setStep('input');
+            console.error(e);
+            setStep('dashboard'); // Fallback to dashboard for consistency
         }
     };
 
+    const handleViewProject = (project) => {
+        setModalProject(project);
+        setIsModalOpen(true);
+    };
+
     const handleProjectSelect = async (project) => {
+        setIsModalOpen(false);
         setSelectedProject(project);
         setStep('roadmap-loading');
 
@@ -167,14 +259,14 @@ export const BeginnerMode = ({ gemini, onBack }) => {
             setStep('roadmap');
         } catch (e) {
             alert("AI Error: " + e.message);
-            setStep('project-selection');
+            setStep('dashboard');
         }
     };
 
     const handleSwitchProject = () => {
         setSelectedProject(null);
         setRoadmap(null);
-        setStep('project-selection');
+        setStep('dashboard');
     };
 
     const handleStartOver = () => {
@@ -312,163 +404,243 @@ export const BeginnerMode = ({ gemini, onBack }) => {
         );
     }
 
-    // PROJECT SELECTION SCREEN
-    if (step === 'project-selection' && results) {
+    // DASHBOARD (FLAT ARCHITECTURE)
+    if (step === 'dashboard') {
         const displayInterest = isCustomInterest ? formData.customInterest : formData.interest;
-        const displayType = isCustomType ? formData.customType : formData.type;
 
-        // Flatten all project directions from all domains
-        const allProjects = results.domains.flatMap(domain =>
-            domain.directions.map(direction => ({
-                name: direction,
-                domain: domain.name,
-                friendly: domain.friendly
+        // 1. DYNAMIC PATHWAYS: Use AI results if available, otherwise fallback to hardcoded data
+        const currentPathways = results?.domains?.map(d => ({
+            name: d.name,
+            description: d.description,
+            projects: (d.directions || []).map(dir => ({
+                name: dir,
+                description: `A specialized research project focused on ${dir} within the ${d.name} domain.`,
+                skills: d.skills || []
             }))
-        );
+        })) || DOMAIN_DATA[displayInterest] || DEFAULT_PATHWAYS;
+
+        // 2. DYNAMIC CORE LIBRARY: Extract all "directions" from the AI results to fill the 6 slots
+        const dynamicCoreProjects = results?.domains?.flatMap(domain =>
+            (domain.directions || []).map(direction => ({
+                name: direction,
+                description: `A specialized beginner project in the field of ${domain.name} focusing on ${direction}.`,
+                skills: domain.skills || []
+            }))
+        ).slice(0, 6) || CORE_PROJECTS;
 
         return (
-            <div className="container" style={{ marginTop: '40px' }}>
-                <button onClick={() => setStep('results')} className="btn-secondary" style={{ marginBottom: '24px' }}>
-                    &larr; Back to Suggestions
-                </button>
+            <div className="dashboard-bg">
+                <style>{`
+                    .dashboard-bg {
+                        background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0A0A0B 100%);
+                        min-height: 100vh;
+                        padding: 40px 24px;
+                        color: var(--text-primary);
+                    }
+                    .glass-card {
+                        background: rgba(255, 255, 255, 0.03);
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 16px;
+                        padding: 24px;
+                        transition: all 0.3s ease;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .glass-card:hover {
+                        border-color: rgba(0, 242, 255, 0.4);
+                        box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
+                        transform: translateY(-4px);
+                    }
+                    .badge-gold {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        background: rgba(255, 215, 0, 0.1);
+                        color: #FFD700;
+                        padding: 4px 10px;
+                        border-radius: 8px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                    }
+                    .modal-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1000;
+                        backdrop-filter: blur(8px);
+                    }
+                    .glass-modal {
+                        background: rgba(10, 10, 11, 0.9);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        max-width: 600px;
+                        width: 90%;
+                        padding: 40px;
+                        border-radius: 24px;
+                        position: relative;
+                        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+                    }
+                    .pill-badge {
+                        background: rgba(0, 242, 255, 0.1);
+                        color: var(--primary-neon);
+                        padding: 6px 14px;
+                        border-radius: 20px;
+                        font-size: 0.85rem;
+                        border: 1px solid rgba(0, 242, 255, 0.2);
+                    }
+                    .section-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        margin-bottom: 24px;
+                        font-size: 1.5rem;
+                    }
+                    .card-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 12px;
+                    }
+                    .card-header h3 {
+                        font-size: 1.1rem;
+                        max-width: 80%;
+                    }
+                    .card-desc {
+                        color: var(--text-muted);
+                        font-size: 0.85rem;
+                        line-height: 1.5;
+                        margin-bottom: 20px;
+                    }
+                `}</style>
 
-                <h1 style={{ marginBottom: '12px' }}>Choose Your Project</h1>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '40px', fontSize: '1.1rem' }}>
-                    Select one project to get a detailed, mentor-guided roadmap. Don't worry - you can always switch later!
-                </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-                    {allProjects.map((project, idx) => (
-                        <div
-                            key={idx}
-                            onClick={() => handleProjectSelect(project)}
-                            className="glass-panel"
-                            style={{
-                                padding: '24px',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s',
-                                borderLeft: `4px solid ${project.friendly ? 'var(--primary-neon)' : 'var(--secondary-neon)'}`,
-                                position: 'relative'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-4px)';
-                                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 242, 255, 0.2)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            {project.friendly && (
-                                <span style={{
-                                    position: 'absolute',
-                                    top: '12px',
-                                    right: '12px',
-                                    background: 'rgba(0, 242, 255, 0.1)',
-                                    color: 'var(--primary-neon)',
-                                    padding: '4px 10px',
-                                    borderRadius: '8px',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600
-                                }}>
-                                    ✨ Beginner
-                                </span>
-                            )}
-                            <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', paddingRight: '80px' }}>{project.name}</h3>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>From: {project.domain}</p>
-                            <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-neon)', fontSize: '0.9rem' }}>
-                                <ArrowRight size={16} />
-                                Click to get roadmap
+                <div className="container">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+                        <div>
+                            <button onClick={handleStartOver} className="btn-secondary" style={{ marginBottom: '16px' }}>
+                                &larr; Back to Search
+                            </button>
+                            <h1 style={{ fontSize: '2.25rem', marginBottom: '8px' }}>Research Dashboard</h1>
+                            <p style={{ color: 'var(--text-secondary)' }}>
+                                Primary Pathways for <b>{displayInterest}</b>
+                            </p>
+                        </div>
+                        <div className="glass-panel" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div className="badge-gold">
+                                <Star size={14} fill="#FFD700" />
+                                <span>Beginner Tier</span>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
 
-                <div style={{ marginTop: '40px', padding: '24px', background: 'rgba(0, 242, 255, 0.05)', borderRadius: '12px', border: '1px solid rgba(0, 242, 255, 0.2)', textAlign: 'center' }}>
-                    <p style={{ color: 'var(--text-secondary)' }}>
-                        <b>Not sure yet?</b> Go back to review the domain suggestions, or start over to try different criteria.
-                    </p>
-                </div>
-            </div>
-        );
-    }
+                    {/* Section A: Primary Research Pathways */}
+                    <div style={{ marginBottom: '60px' }}>
+                        <h2 style={{ marginBottom: '24px', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Zap color="var(--primary-neon)" /> Primary Research Pathways
+                        </h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                            {currentPathways.map((path, idx) => (
+                                <div key={idx} className="glass-card">
+                                    <h3 style={{ color: 'var(--primary-neon)', marginBottom: '12px' }}>{path.name}</h3>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '20px' }}>{path.description}</p>
 
-    // RESULTS SCREEN (Domain Suggestions)
-    if (step === 'results' && results) {
-        const displayInterest = isCustomInterest ? formData.customInterest : formData.interest;
-        const displayType = isCustomType ? formData.customType : formData.type;
-
-        return (
-            <div className="container" style={{ marginTop: '40px' }}>
-                <button onClick={() => setStep('input')} className="btn-secondary" style={{ marginBottom: '24px' }}>
-                    &larr; Search Again
-                </button>
-
-                <h1 style={{ marginBottom: '8px' }}>Your Personalized Research Pathways</h1>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '40px' }}>
-                    Curated based on your interest in <b>{displayInterest}</b> and <b>{displayType}</b> at <b>{formData.level}</b> level.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                    {results.domains.map((domain, idx) => (
-                        <div key={idx} className="glass-panel" style={{ padding: '32px', borderLeft: `4px solid ${domain.friendly ? 'var(--primary-neon)' : 'var(--secondary-neon)'}` }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                                <h2 style={{ color: 'var(--primary-neon)' }}>{domain.name}</h2>
-                                {domain.friendly && (
-                                    <span style={{ background: 'rgba(0, 242, 255, 0.1)', color: 'var(--primary-neon)', padding: '6px 16px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 }}>
-                                        ✨ Beginner Friendly
-                                    </span>
-                                )}
-                            </div>
-
-                            <p style={{ margin: '16px 0', fontSize: '1.1rem', lineHeight: '1.6' }}>{domain.description}</p>
-
-                            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', marginTop: '24px' }}>
-                                <div style={{ flex: 1, minWidth: '250px' }}>
-                                    <h4 style={{ color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Zap size={16} /> Required Skills
-                                    </h4>
-                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                        {domain.skills.map((skill, i) => (
-                                            <span key={i} style={{ border: '1px solid var(--border-glass)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.9rem', background: 'rgba(0, 242, 255, 0.05)' }}>
-                                                {skill}
-                                            </span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {(path.projects || []).map((proj, pIdx) => (
+                                            <div key={pIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                                                <span style={{ fontSize: '0.9rem' }}>{proj.name}</span>
+                                                <button
+                                                    onClick={() => handleViewProject(proj)}
+                                                    style={{ background: 'none', border: 'none', color: 'var(--primary-neon)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                                >
+                                                    <Eye size={16} /> View
+                                                </button>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    </div>
 
-                                <div style={{ flex: 1, minWidth: '250px' }}>
-                                    <h4 style={{ color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Star size={16} /> Suggested Entry Projects
-                                    </h4>
-                                    <ul style={{ paddingLeft: '20px', color: 'var(--text-primary)' }}>
-                                        {domain.directions.map((dir, i) => (
-                                            <li key={i} style={{ marginBottom: '10px', lineHeight: '1.5' }}>{dir}</li>
-                                        ))}
-                                    </ul>
+                    {/* Section B: Core Project Library */}
+                    <div>
+                        <h2 className="section-header">
+                            <BookOpen color="var(--secondary-neon)" /> Core Project Library
+                        </h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                            {dynamicCoreProjects.map((project, idx) => (
+                                <div key={idx} className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <div className="card-header">
+                                            <h3>{project.name}</h3>
+                                            <div className="badge-gold">
+                                                <Star size={10} fill="#FFD700" />
+                                            </div>
+                                        </div>
+                                        <p className="card-desc">
+                                            {project.description.length > 80 ? project.description.substring(0, 80) + '...' : project.description}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleViewProject(project)}
+                                        className="btn-secondary"
+                                        style={{ marginTop: 'auto', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    >
+                                        <Eye size={16} /> View
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* MODAL */}
+                {isModalOpen && modalProject && (
+                    <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                        <div className="glass-modal" onClick={e => e.stopPropagation()}>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                            >
+                                <X size={24} />
+                            </button>
+
+                            <div style={{ marginBottom: '32px' }}>
+                                <div className="badge-gold" style={{ width: 'fit-content', marginBottom: '12px' }}>
+                                    <Star size={14} fill="#FFD700" />
+                                    <span>Beginner Friendly Project</span>
+                                </div>
+                                <h2 style={{ fontSize: '2rem', marginBottom: '16px' }}>{modalProject.name}</h2>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.7' }}>
+                                    {modalProject.description}
+                                </p>
+                            </div>
+
+                            <div style={{ marginBottom: '40px' }}>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Required Skills</h4>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    {(modalProject.skills || []).map((skill, sIdx) => (
+                                        <span key={sIdx} className="pill-badge">{skill}</span>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
 
-                <div style={{ marginTop: '60px', textAlign: 'center' }}>
-                    <button
-                        className="btn-primary"
-                        onClick={() => setStep('project-selection')}
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            padding: '16px 32px',
-                            fontSize: '1.1rem'
-                        }}
-                    >
-                        <Target size={24} />
-                        Choose a Project & Get Roadmap
-                        <ArrowRight size={20} />
-                    </button>
-                </div>
+                            <button
+                                onClick={() => handleProjectSelect(modalProject)}
+                                className="btn-primary"
+                                style={{ width: '100%', padding: '18px', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
+                            >
+                                <ArrowRight size={20} />
+                                Get My Research Roadmap
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -505,8 +677,7 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                             value={formData.interest}
                             onChange={(e) => setFormData({
                                 ...formData,
-                                interest: e.target.value,
-                                focusArea: 'None - Keep it broad' // Reset focus area when interest changes
+                                interest: e.target.value
                             })}
                             style={{ width: '100%' }}
                         >
@@ -531,39 +702,6 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                             />
                         )}
                     </div>
-
-                    {/* Focus Area (Optional Inner Domain) */}
-                    {!isCustomInterest && (
-                        <div>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--text-primary)', fontWeight: '500' }}>
-                                <Target size={18} color="var(--primary-neon)" />
-                                Want to focus on something specific? (Optional)
-                            </label>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                                You can pick a focus area if you want, or keep it broad - it's totally up to you!
-                            </p>
-                            <select
-                                value={formData.focusArea}
-                                onChange={(e) => setFormData({ ...formData, focusArea: e.target.value })}
-                                style={{ width: '100%' }}
-                            >
-                                {FOCUS_AREAS[formData.interest].map(f => <option key={f} value={f}>{f}</option>)}
-                            </select>
-                            {formData.focusArea !== 'None - Keep it broad' && (
-                                <div style={{
-                                    marginTop: '12px',
-                                    padding: '12px',
-                                    background: 'rgba(0, 242, 255, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(0, 242, 255, 0.2)',
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-secondary)'
-                                }}>
-                                    ✓ Great! We'll personalize suggestions for <b style={{ color: 'var(--primary-neon)' }}>{formData.focusArea}</b>
-                                </div>
-                            )}
-                        </div>
-                    )}
 
                     {/* Data Type */}
                     <div>
