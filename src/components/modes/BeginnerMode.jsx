@@ -100,6 +100,22 @@ const FOCUS_AREAS = {
         'Lab Automation',
         'Research Tools'
     ],
+    'Web Development': [
+        'None - Keep it broad',
+        'Frontend Development',
+        'Backend Development',
+        'Full Stack Development',
+        'Web Security',
+        'Progressive Web Apps'
+    ],
+    'Cybersecurity': [
+        'None - Keep it broad',
+        'Network Security',
+        'Ethical Hacking',
+        'Cryptography',
+        'Cloud Security',
+        'IoT Security'
+    ],
     'Other (Custom)': [
         'None - Keep it broad'
     ]
@@ -321,53 +337,115 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                     </p>
                 </div>
 
+                {/* Research Papers Section */}
+                {roadmap.researchPapers && roadmap.researchPapers.length > 0 && (
+                    <div className="glass-panel" style={{ padding: '32px', marginBottom: '32px', border: '1px solid rgba(0, 242, 255, 0.2)' }}>
+                        <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <BookOpen size={28} color="var(--primary-neon)" />
+                            Recommended Research Papers
+                        </h2>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                            Explore these 30 research papers relevant to your project. Click any title to search on Google Scholar.
+                        </p>
+                        <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '12px' }}>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                {roadmap.researchPapers.map((paper, idx) => (
+                                    <li key={idx} style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px' }}>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', minWidth: '24px', paddingTop: '4px' }}>{idx + 1}.</span>
+                                        <a
+                                            href={`https://scholar.google.com/scholar?q=${encodeURIComponent(paper)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                color: 'var(--primary-neon)',
+                                                textDecoration: 'none',
+                                                fontSize: '1.05rem',
+                                                lineHeight: '1.5',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.textDecoration = 'underline';
+                                                e.currentTarget.style.color = '#fff';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.textDecoration = 'none';
+                                                e.currentTarget.style.color = 'var(--primary-neon)';
+                                            }}
+                                        >
+                                            {paper}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+
                 {/* Phases */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     {roadmap.phases.map((phase, idx) => (
-                        <div key={idx} className="glass-panel" style={{ padding: '32px', borderLeft: '4px solid var(--primary-neon)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-                                <div style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: '50%',
-                                    background: 'var(--primary-neon)',
-                                    color: '#000',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 'bold',
-                                    fontSize: '1.2rem',
-                                    flexShrink: 0
-                                }}>
-                                    {idx + 1}
+                        <div key={idx} className="glass-panel" style={{ padding: '0', borderLeft: '4px solid var(--primary-neon)', overflow: 'hidden' }}>
+                            {/* Dynamic Image */}
+                            {phase.imagePrompt && (
+                                <div style={{ width: '100%', height: '300px', overflow: 'hidden', position: 'relative', backgroundColor: '#1a1a1b' }}>
+                                    <img
+                                        src={`https://image.pollinations.ai/prompt/${encodeURIComponent(phase.imagePrompt)}?width=1200&height=600&nologo=true&seed=${idx}`}
+                                        alt={phase.title}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.parentElement.style.display = 'none';
+                                        }}
+                                    />
+                                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, rgba(10,10,11,1), transparent)' }}></div>
                                 </div>
-                                <div>
-                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{phase.title}</h3>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{phase.objective}</p>
+                            )}
+
+                            <div style={{ padding: '32px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                                    <div style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        borderRadius: '50%',
+                                        background: 'var(--primary-neon)',
+                                        color: '#000',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontWeight: 'bold',
+                                        fontSize: '1.2rem',
+                                        flexShrink: 0
+                                    }}>
+                                        {idx + 1}
+                                    </div>
+                                    <div>
+                                        <h3 style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{phase.title}</h3>
+                                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{phase.objective}</p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div style={{ marginTop: '24px' }}>
-                                <h4 style={{ color: 'var(--primary-neon)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <BookOpen size={18} /> What to Learn & Do
-                                </h4>
-                                <p style={{ lineHeight: '1.7', marginBottom: '16px' }}>{phase.whatToDo}</p>
-                            </div>
-
-                            <div style={{ marginTop: '20px' }}>
-                                <h4 style={{ color: 'var(--secondary-neon)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <Lightbulb size={18} /> Mentor Guidance
-                                </h4>
-                                <div style={{ background: 'rgba(189, 0, 255, 0.05)', padding: '16px', borderRadius: '8px', borderLeft: '3px solid var(--secondary-neon)' }}>
-                                    <p style={{ lineHeight: '1.7', fontStyle: 'italic' }}>{phase.mentorGuidance}</p>
+                                <div style={{ marginTop: '24px' }}>
+                                    <h4 style={{ color: 'var(--primary-neon)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <BookOpen size={18} /> What to Learn & Do
+                                    </h4>
+                                    <p style={{ lineHeight: '1.7', marginBottom: '16px' }}>{phase.whatToDo}</p>
                                 </div>
-                            </div>
 
-                            <div style={{ marginTop: '20px' }}>
-                                <h4 style={{ color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <CheckCircle size={18} /> How You Know You're Done
-                                </h4>
-                                <p style={{ lineHeight: '1.7', color: 'var(--text-secondary)' }}>{phase.outcome}</p>
+                                <div style={{ marginTop: '20px' }}>
+                                    <h4 style={{ color: 'var(--secondary-neon)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Lightbulb size={18} /> Mentor Guidance
+                                    </h4>
+                                    <div style={{ background: 'rgba(189, 0, 255, 0.05)', padding: '16px', borderRadius: '8px', borderLeft: '3px solid var(--secondary-neon)' }}>
+                                        <p style={{ lineHeight: '1.7', fontStyle: 'italic' }}>{phase.mentorGuidance}</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '20px' }}>
+                                    <h4 style={{ color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <CheckCircle size={18} /> How You Know You're Done
+                                    </h4>
+                                    <p style={{ lineHeight: '1.7', color: 'var(--text-secondary)' }}>{phase.outcome}</p>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -467,6 +545,8 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                         border-radius: 24px;
                         position: relative;
                         box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+                        max-height: 85vh;
+                        overflow-y: auto;
                     }
                     .pill-badge {
                         background: rgba(0, 242, 255, 0.1);

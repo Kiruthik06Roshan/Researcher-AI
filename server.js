@@ -20,6 +20,7 @@ console.log("DEBUG: Key loaded (length):", API_KEY.length);
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 // List of fallback models (Strict Mode: User Request)
+// List of fallback models (Strict Mode: User Request)
 const MODELS = [
   "gemini-2.5-flash"
 ];
@@ -63,37 +64,46 @@ const cleanJson = (text) => {
 
 // Helper for rate limits & model fallbacks
 const generateWithRetry = async (currentModel, prompt, retries = 5) => {
-  let modelToUse = currentModel;
+  const modelName = "gemini-2.5-flash";
 
-  // Strategy: Try the current model. If it fails with 404 or 429, switch to next fallback.
-  let queue = [modelToUse.model];
-  for (const m of MODELS) {
-    if (!queue.includes(m)) queue.push(m);
-  }
-
-  for (const modelName of queue) {
-    console.log(`Trying model: ${modelName}...`);
-    const activeModel = genAI.getGenerativeModel({ model: modelName });
-
+  for (let attempt = 0; attempt <= retries; attempt++) {
     try {
+      console.log(`[Attempt ${attempt + 1}/${retries + 1}] Generate with ${modelName}...`);
+      const activeModel = genAI.getGenerativeModel({ model: modelName });
       return await activeModel.generateContent(prompt);
     } catch (error) {
-      console.warn(`Model ${modelName} failed: ${error.message}`);
+      console.warn(`Attempt ${attempt + 1} failed: ${error.message}`);
 
       const isRateLimit = error.message.includes("429") || error.message.includes("quota") || error.message.includes("retry");
-      const isNotFound = error.message.includes("404") || error.message.includes("not found");
 
-      if (isRateLimit || isNotFound) {
-        console.log(`Switching to next model due to failure...`);
+      if (attempt === retries) {
+        console.error("Max retries reached. Failing.");
+        throw error;
+      }
+
+      if (isRateLimit) {
+        // Parse retry delay from error message if available, else exponential backoff
+        // Default base backoff: 2s, 4s, 8s, 16s, 32s...
+        let waitTime = Math.pow(2, attempt) * 2000;
+
+        // Add some jitter
+        waitTime += Math.random() * 1000;
+
+        console.log(`Rate limit hit. Waiting ${(waitTime / 1000).toFixed(2)}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
       }
 
-      console.log("Unknown error, trying next model just in case...");
-      continue;
+      // If it's not a rate limit error (e.g., 400, 500), maybe we shouldn't retry instantly or at all?
+      // For now, let's treat other errors with a short delay and retry, or throw if it's a 400 Bad Request.
+      if (error.message.includes("400")) {
+        throw error;
+      }
+
+      console.log(`Error occurred. Retrying in 2s...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
-
-  throw new Error("All models failed after fallback attempts.");
 };
 
 // Route: Beginner Mode
@@ -202,12 +212,27 @@ app.post('/api/beginner/roadmap', async (req, res) => {
       - Suggest skills to learn next
       - Connect this project to future advanced work
 
+      ADDITIONAL REQUIREMENT:
+      - Generate a list of exactly 30 distinct, real or highly realistic research paper titles relevant to this project content.
+      - These should cover foundational theories, similar implementations, and advanced extensions.
+      
+      CRITICAL: For each phase, generate a UNIQUE and SPECIFIC imagePrompt that visually represents THAT SPECIFIC PHASE's content.
+      - DO NOT use generic placeholders like "[Phase Topic]"
+      - Each imagePrompt should describe a concrete, visual scene related to what the user will be doing in that phase
+      - Examples: "A developer writing Python code on a laptop with data visualizations on screen", "A person analyzing colorful data charts and graphs on multiple monitors", "Hands building a simple web interface prototype with wireframes"
+
       OUTPUT JSON FORMAT:
       {
+        "researchPapers": [
+            "Title of Research Paper 1",
+            "Title of Research Paper 2",
+            ... (30 papers total)
+        ],
         "overview": "Brief 2-3 sentence overview of the project journey",
         "phases": [
           {
             "title": "Phase 1: Project Understanding",
+            "imagePrompt": "Specific visual description for THIS phase (e.g., 'A person studying data charts and graphs on a laptop, modern workspace, soft lighting, digital art')",
             "objective": "Clear objective of this phase",
             "whatToDo": "Detailed explanation of what to learn and do",
             "mentorGuidance": "Practical mentoring guidance - what to focus on, what to avoid",
@@ -227,6 +252,17 @@ app.post('/api/beginner/roadmap', async (req, res) => {
     const response = await result.response;
     const text = response.text();
     const json = JSON.parse(cleanJson(text));
+
+    // LOGGING TO DEBUG MISSING PAPERS
+    console.log("DEBUG: Roadmap AI Response JSON Keys:", Object.keys(json));
+    if (json.researchPapers) {
+      console.log("DEBUG: Research Papers Count:", json.researchPapers.length);
+    } else {
+      console.error("DEBUG: Research Papers MISSING in response!");
+      // Fallback if needed, though prompt fix should help
+      json.researchPapers = [];
+    }
+
     res.json(json);
 
   } catch (error) {
