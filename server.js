@@ -34,7 +34,6 @@ const cleanJson = (text) => {
   let cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
   // Try to find JSON object or array
-  // Look for the first { or [ and the last } or ]
   const firstBrace = cleaned.indexOf('{');
   const firstBracket = cleaned.indexOf('[');
   const lastBrace = cleaned.lastIndexOf('}');
@@ -45,20 +44,142 @@ const cleanJson = (text) => {
   let end = -1;
 
   if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
-    // It's an object
     start = firstBrace;
     end = lastBrace + 1;
   } else if (firstBracket !== -1) {
-    // It's an array
     start = firstBracket;
     end = lastBracket + 1;
   }
 
   if (start !== -1 && end !== -1) {
-    return cleaned.substring(start, end);
+    // Extract ONLY the JSON object, nothing before or after
+    cleaned = cleaned.substring(start, end).trim();
   }
 
-  return cleaned;
+  // Double-check: ensure no trailing content after the JSON
+  // Find the actual end of the JSON object by counting braces
+  let braceCount = 0;
+  let actualEnd = -1;
+  let inStr = false;
+  let escNext = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+
+    if (escNext) {
+      escNext = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escNext = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inStr = !inStr;
+      continue;
+    }
+
+    if (!inStr) {
+      if (char === '{') braceCount++;
+      if (char === '}') {
+        braceCount--;
+        if (braceCount === 0) {
+          actualEnd = i + 1;
+          break; // Found the end of the JSON object
+        }
+      }
+    }
+  }
+
+  if (actualEnd !== -1 && actualEnd < cleaned.length) {
+    cleaned = cleaned.substring(0, actualEnd);
+  }
+
+  // Try parsing first - if it works, return as-is
+  try {
+    JSON.parse(cleaned);
+    return cleaned;
+  } catch (e) {
+    // Parsing failed - apply fixes
+  }
+
+  // Strategy: Parse character by character, tracking string state
+  let result = '';
+  let inString = false;
+  let escapeNext = false;
+  let currentKey = '';
+  let afterColon = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+    const nextChar = i < cleaned.length - 1 ? cleaned[i + 1] : '';
+
+    // Handle escape sequences
+    if (escapeNext) {
+      result += char;
+      escapeNext = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      result += char;
+      escapeNext = true;
+      continue;
+    }
+
+    // Handle quotes
+    if (char === '"') {
+      inString = !inString;
+      result += char;
+
+      // Track if we just closed a key (before colon)
+      if (!inString && nextChar === ':') {
+        afterColon = false;
+      } else if (!inString && afterColon) {
+        afterColon = false;
+      }
+
+      continue;
+    }
+
+    // Track colons (to know if we're in a value)
+    if (!inString && char === ':') {
+      afterColon = true;
+      result += char;
+      continue;
+    }
+
+    // Inside a string - handle special characters
+    if (inString) {
+      // Escape control characters
+      if (char === '\n') {
+        result += '\\n';
+      } else if (char === '\r') {
+        result += '\\r';
+      } else if (char === '\t') {
+        result += '\\t';
+      } else {
+        result += char;
+      }
+    } else {
+      result += char;
+    }
+  }
+
+  // Final validation attempt
+  try {
+    JSON.parse(result);
+    return result;
+  } catch (e2) {
+    // Last resort: try to fix common patterns
+    // Replace unescaped quotes in the middle of strings (but not at boundaries)
+    // This is a heuristic approach for edge cases
+    console.error("JSON cleaning failed, attempting last-resort fixes...");
+    console.error("Error:", e2.message);
+    return result;
+  }
 };
 
 // Helper for rate limits & model fallbacks
@@ -516,6 +637,228 @@ app.post('/api/paper/synthesize', async (req, res) => {
 
   } catch (error) {
     console.error("Synthesis Error:", error.message);
+    res.status(500).json({ error: "AI Service Error: " + error.message });
+  }
+});
+
+// Route: Paper Summarization (Elite Explanation System)
+app.post('/api/paper/summarize', async (req, res) => {
+  try {
+    const { text, filename } = req.body;
+
+    const prompt = `
+      You are an ELITE PAPER EXPLANATION SYSTEM (COMPACT MODE).
+      Your role is to EXPLAIN research papers with CLARITY and PRECISION.
+      Your goal is UNDERSTANDING, not LENGTH.
+
+      Paper Content:
+      "${text.substring(0, 30000)}..."
+
+      --------------------------------------------------
+      CORE IDENTITY
+      --------------------------------------------------
+      You EXPLAIN everything. You do NOT JUDGE anything.
+
+      This is:
+      - Deep explanation through PRECISION, not verbosity
+      - Clear intuition over lengthy theory
+      - Decision logic over derivation
+
+      This is NOT:
+      - Beginner guidance
+      - Research evaluation
+      - Verbose academic writing
+
+      --------------------------------------------------
+      CRITICAL LANGUAGE RULES
+      --------------------------------------------------
+      ALLOWED TERMS:
+      - methodology, formulation, model, equation, framework, novelty
+      - "The paper explains...", "The authors discuss...", "The paper introduces..."
+      - "This formula is used to represent...", "Intuitively, this means..."
+
+      STRICTLY FORBIDDEN:
+      - evaluation, limitation, weakness, strength, gap, future work critique
+      - "better", "stronger", "robust", "efficient", "significant", "optimal"
+      - "This improves...", "This is more effective...", "This performs better..."
+
+      ACCEPTABLE PHRASING:
+      - "The paper reports..."
+      - "The results show..."
+      - "The figure illustrates..."
+      - "The authors introduce..."
+      - "When this value increases, the model tends to..."
+
+      --------------------------------------------------
+      METHODOLOGY EXPLANATION RULE (COMPACT & MANDATORY)
+      --------------------------------------------------
+      For EACH major methodology step, explain in 2–3 sentences:
+
+      1. WHAT the step does
+      2. WHY it exists in the method
+      3. WHAT idea it represents
+
+      Do NOT elaborate beyond this unless strictly necessary.
+
+      Example:
+      "The genetic algorithm searches for optimal timetable configurations. This is necessary because exhaustive search is computationally intractable. The approach mimics natural evolution, iteratively improving solutions through selection and mutation."
+
+      --------------------------------------------------
+      MATHEMATICAL FORMULATION RULE (COMPACT & ELITE)
+      --------------------------------------------------
+      When a formula appears, explain it in THIS order:
+
+      1. PURPOSE (1 sentence)
+         - What decision or relationship this formula encodes
+
+      2. VARIABLES (brief, 1-2 sentences)
+         - Explain only important variables in plain language
+
+      3. DECISION INTUITION (1-2 sentences)
+         - What the model is encouraged to prefer or avoid
+
+      OPTIONAL (only if it improves understanding):
+      - Mention behavior when a key variable increases/decreases
+
+      STRICT CONSTRAINTS:
+      - If explanation exceeds 4–5 sentences → COMPRESS IT
+      - Do NOT derive formulas
+      - Do NOT prove correctness
+      - Do NOT explain algebra step-by-step
+      - Do NOT add theoretical background unless required
+
+      Example:
+      "This fitness function quantifies how good a timetable is. f(x) combines weighted penalties: w1 for hard constraints (room conflicts) and w2 for soft constraints (preferences). Higher penalties make solutions less desirable, guiding the search toward better configurations."
+
+      --------------------------------------------------
+      VISUAL EXPLANATION RULE (COMPACT)
+      --------------------------------------------------
+      For graphs or charts:
+      - State what is being compared (1 sentence)
+      - State the main visible trend (1 sentence)
+      - Do NOT interpret performance or quality
+
+      Example:
+      "This chart compares algorithm runtime across different problem sizes. The reader should notice that runtime increases exponentially as problem size grows."
+
+      --------------------------------------------------
+      QUALITY CHECK (MANDATORY)
+      --------------------------------------------------
+      After EACH section, internally verify:
+      "Did this explanation help understanding, or just add words?"
+
+      If it added words → SHORTEN IT.
+
+      --------------------------------------------------
+      YOUR TASK
+      --------------------------------------------------
+      Generate a comprehensive 9-section explanation.
+      Depth comes from PRECISION, not LENGTH.
+
+      SECTION 1: Conceptual Orientation
+      - What this paper is about at a high level (2-3 sentences)
+      - Where it fits conceptually (1 sentence)
+      - What the paper is trying to achieve (1 sentence)
+
+      SECTION 2: Problem Definition & Motivation
+      - Clearly explain the problem being addressed (2-3 sentences)
+      - Why this problem exists and why solving it matters (1-2 sentences)
+
+      SECTION 3: Methodology Explained Step-by-Step
+      - Break the method into clear stages or components
+      - For EACH step: WHAT it does, WHY it's necessary, WHAT intuition it represents (2-3 sentences per step)
+      - Use technical precision but maintain clarity
+      - NO critique, ONLY explanation
+
+      SECTION 4: Mathematical Formulation (If Present)
+      - For EACH important formula, follow the COMPACT sequence:
+        1. Purpose (1 sentence)
+        2. Variables (1-2 sentences)
+        3. Decision intuition (1-2 sentences)
+      - If explanation exceeds 4-5 sentences → COMPRESS
+      - If no mathematical formulation exists, state: "No mathematical formulation presented in this paper."
+
+      SECTION 5: What Is Novel in This Work
+      - Clearly state what the authors introduce that is new (2-3 sentences)
+      - Describe novelty factually, not evaluatively
+      - Focus on WHAT is new, not WHETHER it is good
+
+      SECTION 6: Results & Observations Explained
+      - Explain what results the authors report (2-3 sentences)
+      - Describe trends or patterns descriptively
+      - NO performance judgment or comparison language
+
+      SECTION 7: Visual Interpretation
+      - If the paper contains graphs, charts, or tables:
+        • State what is being compared (1 sentence)
+        • State the main visible trend (1 sentence)
+      - If no visual data is present, state: "No visual data or figures discussed in this paper."
+
+      SECTION 8: End-to-End Understanding Summary
+      - Tie everything together (2-3 sentences)
+      - Explain how problem → method → results connect
+      - Help reader see the big picture
+
+      SECTION 9: Key Takeaways for the Reader
+      - Provide 4-6 bullet points
+      - Each bullet should be ONE clear, concise sentence
+      - Focus on comprehension, not evaluation
+
+      --------------------------------------------------
+      OUTPUT JSON FORMAT
+      --------------------------------------------------
+      CRITICAL JSON FORMATTING RULES:
+      - All string values MUST have properly escaped quotes (use \\" for quotes inside strings)
+      - All newlines MUST be escaped as \\n
+      - All tabs MUST be escaped as \\t
+      - Do NOT use literal line breaks inside JSON string values
+      - Ensure all JSON is valid and parseable
+
+      {
+        "filename": "${filename}",
+        "conceptualOrientation": "High-level explanation of what this paper is about...",
+        "problemDefinition": "Clear explanation of the problem and why it matters...",
+        "methodology": "Step-by-step explanation with WHAT/WHY/INTUITION for each step...",
+        "mathematicalFormulation": "Formulas with 6-step decoding sequence, or 'No mathematical formulation presented'...",
+        "novelty": "Factual description of what is new in this work...",
+        "results": "Descriptive explanation of what results show...",
+        "visualInterpretation": "Structured explanation of graphs/charts with axes and trends, or 'No visual data'...",
+        "endToEndSummary": "Complete synthesis tying problem-method-results together...",
+        "keyTakeaways": [
+          "Takeaway 1",
+          "Takeaway 2",
+          "Takeaway 3",
+          "Takeaway 4"
+        ]
+      }
+
+      --------------------------------------------------
+      TONE & FOCUS
+      --------------------------------------------------
+      Tone: Clear, confident, instructor-like, technically precise but readable
+      Style: Expert instructor teaching at a whiteboard
+      Focus: Deep explanation and comprehension, NOT evaluation or judgment
+
+      RETURN ONLY JSON.
+    `;
+
+    const result = await generateWithRetry(model, prompt);
+    const response = await result.response;
+    const rawText = response.text();
+
+    try {
+      const cleanedText = cleanJson(rawText);
+      const json = JSON.parse(cleanedText);
+      res.json(json);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError.message);
+      console.error("Raw AI Response (first 500 chars):", rawText.substring(0, 500));
+      console.error("Cleaned JSON (first 500 chars):", cleanJson(rawText).substring(0, 500));
+      throw new Error("Failed to parse AI response as JSON: " + parseError.message);
+    }
+
+  } catch (error) {
+    console.error("Paper Explanation Error:", error.message);
     res.status(500).json({ error: "AI Service Error: " + error.message });
   }
 });

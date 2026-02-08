@@ -61,4 +61,19 @@ export class GeminiService {
     if (!response.ok) throw new Error("Synthesis Failed");
     return await response.json();
   }
+
+  // MODE 3: Paper Summarization (Reading Assistant)
+  async summarizePaper(text, filename) {
+    const response = await fetch(`${this.baseUrl}/paper/summarize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, filename })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Paper Summarization Failed: ${response.statusText}`);
+    }
+    return await response.json();
+  }
 }

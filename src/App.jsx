@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { GeminiService } from './services/gemini';
-import { BookOpen, FileText, Sparkles, Settings } from 'lucide-react';
+import { BookOpen, FileText, Sparkles, Settings, Compass } from 'lucide-react';
 import { BeginnerMode } from './components/modes/BeginnerMode';
 import { PaperAnalysisMode } from './components/modes/PaperAnalysisMode';
+import { PaperSummarizationMode } from './components/modes/PaperSummarizationMode';
 import './App.css';
 
 const ModeSelector = ({ onSelect }) => {
@@ -15,7 +16,7 @@ const ModeSelector = ({ onSelect }) => {
         Select a mode to begin your research journey.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', maxWidth: '1200px', margin: '0 auto' }}>
         {/* Beginner Mode Card */}
         <div className="glass-panel" style={{ padding: '40px', cursor: 'pointer', transition: '0.3s' }}
           onClick={() => onSelect('beginner')}
@@ -39,6 +40,19 @@ const ModeSelector = ({ onSelect }) => {
           <h2>Paper Analysis</h2>
           <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>
             I have papers and need to find a research gap.
+          </p>
+        </div>
+
+        {/* Paper Summarization Mode Card */}
+        <div className="glass-panel" style={{ padding: '40px', cursor: 'pointer', transition: '0.3s' }}
+          onClick={() => onSelect('summarization')}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#ff6b9d'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-glass)'}
+        >
+          <Compass size={48} color="#ff6b9d" style={{ marginBottom: '24px' }} />
+          <h2>Paper Explanation</h2>
+          <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>
+            I want to deeply understand a paper's methodology and concepts.
           </p>
         </div>
       </div>
@@ -77,6 +91,13 @@ function App() {
 
       {mode === 'analysis' && (
         <PaperAnalysisMode
+          gemini={gemini}
+          onBack={() => setMode(null)}
+        />
+      )}
+
+      {mode === 'summarization' && (
+        <PaperSummarizationMode
           gemini={gemini}
           onBack={() => setMode(null)}
         />
