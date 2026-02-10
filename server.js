@@ -339,8 +339,13 @@ app.post('/api/beginner/roadmap', async (req, res) => {
       
       CRITICAL: For each phase, generate a UNIQUE and SPECIFIC imagePrompt that visually represents THAT SPECIFIC PHASE's content.
       - DO NOT use generic placeholders like "[Phase Topic]"
-      - Each imagePrompt should describe a concrete, visual scene related to what the user will be doing in that phase
-      - Examples: "A developer writing Python code on a laptop with data visualizations on screen", "A person analyzing colorful data charts and graphs on multiple monitors", "Hands building a simple web interface prototype with wireframes"
+      - Each imagePrompt must be DISTINCT from the others.
+      - Each imagePrompt should describe a concrete, visual scene related to what the user will be doing in that phase.
+      - Examples: 
+        - "A developer writing Python code on a laptop with data visualizations on screen, cyberpunk style"
+        - "A person analyzing colorful data charts and graphs on multiple monitors, futuristic lab"
+        - "Hands building a simple web interface prototype with wireframes, blueprint style"
+        - "A digital brain neural network structure glowing, 3d render"
 
       OUTPUT JSON FORMAT:
       {
@@ -950,6 +955,34 @@ app.post('/api/paper/format', async (req, res) => {
 
   } catch (error) {
     console.error("Formatting Error:", error.message);
+    res.status(500).json({ error: "AI Service Error: " + error.message });
+  }
+});
+
+// Route: Core Navigator Chat
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    console.log(`DEBUG: Chat Request - "${message}"`);
+
+    // Basic prompt construction
+    let prompt = "You are Core Navigator, an AI assistant for the Ideaora research platform.\n";
+    prompt += "Help users with navigation, features, and general research questions.\n";
+    prompt += "Keep answers concise, helpful, and friendly.\n\n";
+
+    if (history && history.length > 0) {
+      prompt += "History:\n" + history.map(msg => `${msg.role}: ${msg.content}`).join("\n") + "\n\n";
+    }
+
+    prompt += `User: ${message}\nAssistant:`;
+
+    const result = await generateWithRetry(model, prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ response: text });
+  } catch (error) {
+    console.error("Chat Error:", error.message);
     res.status(500).json({ error: "AI Service Error: " + error.message });
   }
 });

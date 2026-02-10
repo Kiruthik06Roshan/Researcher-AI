@@ -6,6 +6,7 @@ import { PaperAnalysisMode } from './components/modes/PaperAnalysisMode';
 import { PaperSummarizationMode } from './components/modes/PaperSummarizationMode';
 import { PaperFormattingMode } from './components/modes/PaperFormattingMode';
 import './App.css';
+import { CoreNavigator } from './components/CoreNavigator/CoreNavigator';
 
 const ModeSelector = ({ onSelect }) => {
   return (
@@ -119,12 +120,15 @@ function App() {
 
       {mode === 'formatting' && (
         <PaperFormattingMode
-            gemini={gemini}
-            onBack={() => setMode(null)}
+          gemini={gemini}
+          onBack={() => setMode(null)}
         />
       )}
+
+      <CoreNavigator />
     </div>
   );
 }
+
 
 export default App;

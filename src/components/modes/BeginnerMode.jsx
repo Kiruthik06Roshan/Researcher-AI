@@ -385,21 +385,6 @@ export const BeginnerMode = ({ gemini, onBack }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     {roadmap.phases.map((phase, idx) => (
                         <div key={idx} className="glass-panel" style={{ padding: '0', borderLeft: '4px solid var(--primary-neon)', overflow: 'hidden' }}>
-                            {/* Dynamic Image */}
-                            {phase.imagePrompt && (
-                                <div style={{ width: '100%', height: '300px', overflow: 'hidden', position: 'relative', backgroundColor: '#1a1a1b' }}>
-                                    <img
-                                        src={`https://image.pollinations.ai/prompt/${encodeURIComponent(phase.imagePrompt)}?width=1200&height=600&nologo=true&seed=${idx}`}
-                                        alt={phase.title}
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.parentElement.style.display = 'none';
-                                        }}
-                                    />
-                                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, rgba(10,10,11,1), transparent)' }}></div>
-                                </div>
-                            )}
 
                             <div style={{ padding: '32px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
