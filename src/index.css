@@ -118,6 +118,28 @@ textarea:focus {
   padding: 24px;
 }
 
+/* Back Button Style - Matches Ideaora Theme */
+.back-button {
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  font-family: var(--font-main);
+  font-size: 1rem;
+}
+
+.back-button:hover {
+  border-color: var(--primary-neon);
+  color: var(--primary-neon);
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
+}
+
 /* Animations */
 .spin {
   animation: spin 1s linear infinite;

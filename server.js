@@ -899,6 +899,61 @@ app.post('/api/paper/summarize', async (req, res) => {
   }
 });
 
+// Endpoint: Paper Formatting (Journal Style)
+app.post('/api/paper/format', async (req, res) => {
+  try {
+    const { text, journalStyle } = req.body;
+
+    if (!text || text.length < 50) {
+      return res.status(400).json({ error: "Paper text is too short or missing." });
+    }
+
+    if (!journalStyle) {
+      return res.status(400).json({ error: "Journal style is required." });
+    }
+
+    console.log(`Analyzing for formatting: ${journalStyle}`);
+
+    // Updated Prompt: HTML Generation for Better Formatting Control
+    const prompt = `
+      You are an expert academic typesetter and editor. Your task is to format the provided research paper text into a semantic HTML document that visually implies the style of the target journal.
+
+      Target Journal Style: "${journalStyle}"
+      
+      Instructions:
+      1. **CONTENT PRESERVATION**: You must PRESERVE the original text content exactly. Do NOT summarize, rewrite, or simplify the scientific content. Only fix obvious typos or broken line breaks.
+      2. **Structure**: Identify the Title, Authors (if present), Abstract, Keywords, Headings, Subheadings, Body Text, Lists, and References.
+      3. **HTML Output**: Generate a full HTML snippet (without \`<html>\` or \`<body>\` tags, just the inner content div) suitable for rendering.
+      4. **Styling (CRITICAL)**:
+         - Use INLINE CSS or a \`<style>\` block to strictly enforce the visual look of ${journalStyle}.
+         - If ${journalStyle} uses a two-column layout (like IEEE/ACM), wrap the body content in a div with \`column-count: 2; column-gap: 20px; text-align: justify;\`.
+         - Ensure the Title and Abstract span across the full width (do not put them inside the columns).
+         - Use correct fonts (e.g., Times New Roman for IEEE, Arial/Helvetica for others if applicable).
+         - Format Reference list appropriately.
+      
+      Input Text:
+      """
+      ${text.substring(0, 35000)}
+      """
+
+      Return ONLY the HTML string. Do not use markdown code blocks.
+    `;
+
+    const result = await generateWithRetry(model, prompt);
+    const response = await result.response;
+    let htmlContent = response.text();
+
+    // Cleanup potential markdown fences if the model ignores the instruction
+    htmlContent = htmlContent.replace(/```html/g, '').replace(/```/g, '');
+
+    res.json({ htmlContent });
+
+  } catch (error) {
+    console.error("Formatting Error:", error.message);
+    res.status(500).json({ error: "AI Service Error: " + error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Research Logic Server running on http://localhost:${PORT}`);
 });

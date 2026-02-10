@@ -76,4 +76,20 @@ export class GeminiService {
     }
     return await response.json();
   }
+
+  // MODE 4: Paper Formatting
+  async formatPaper(text, journalStyle) {
+    const response = await fetch(`${this.baseUrl}/paper/format`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, journalStyle })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Paper Formatting Failed: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.htmlContent;
+  }
 }

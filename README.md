@@ -1,4 +1,4 @@
-# ResearchAI
+# Ideaora
 
 An AI-powered Research Companion helping researchers identify domains, analyze papers, and find research gaps using Gemini 2.0 Flash.
 

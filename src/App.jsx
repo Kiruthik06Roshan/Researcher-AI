@@ -4,6 +4,7 @@ import { BookOpen, FileText, Sparkles, Settings, Compass } from 'lucide-react';
 import { BeginnerMode } from './components/modes/BeginnerMode';
 import { PaperAnalysisMode } from './components/modes/PaperAnalysisMode';
 import { PaperSummarizationMode } from './components/modes/PaperSummarizationMode';
+import { PaperFormattingMode } from './components/modes/PaperFormattingMode';
 import './App.css';
 
 const ModeSelector = ({ onSelect }) => {
@@ -55,6 +56,19 @@ const ModeSelector = ({ onSelect }) => {
             I want to deeply understand a paper's methodology and concepts.
           </p>
         </div>
+
+        {/* Paper Formatting Mode Card */}
+        <div className="glass-panel" style={{ padding: '40px', cursor: 'pointer', transition: '0.3s' }}
+          onClick={() => onSelect('formatting')}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = '#4dffb8'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-glass)'}
+        >
+          <Settings size={48} color="#4dffb8" style={{ marginBottom: '24px' }} />
+          <h2>Paper Formatting</h2>
+          <p style={{ marginTop: '16px', color: 'var(--text-secondary)' }}>
+            Format your paper according to journal guidelines.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -69,7 +83,7 @@ function App() {
       <nav style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => setMode(null)}>
           <Sparkles size={24} color="var(--primary-neon)" />
-          <span style={{ fontWeight: 600, fontSize: '1.2rem' }}>ResearchAI</span>
+          <span style={{ fontWeight: 600, fontSize: '1.2rem' }}>Ideaora</span>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           {/* Status Indicator */}
@@ -100,6 +114,13 @@ function App() {
         <PaperSummarizationMode
           gemini={gemini}
           onBack={() => setMode(null)}
+        />
+      )}
+
+      {mode === 'formatting' && (
+        <PaperFormattingMode
+            gemini={gemini}
+            onBack={() => setMode(null)}
         />
       )}
     </div>
