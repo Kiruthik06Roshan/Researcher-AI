@@ -4,6 +4,7 @@ import { BookOpen, FileText, Sparkles, Settings, Compass } from 'lucide-react';
 import { BeginnerMode } from './components/modes/BeginnerMode';
 import { PaperAnalysisMode } from './components/modes/PaperAnalysisMode';
 import { PaperSummarizationMode } from './components/modes/PaperSummarizationMode';
+import { CoreNavigator } from './components/CoreNavigator/CoreNavigator';
 import './App.css';
 
 const ModeSelector = ({ onSelect }) => {
@@ -102,6 +103,8 @@ function App() {
           onBack={() => setMode(null)}
         />
       )}
+
+      <CoreNavigator />
     </div>
   );
 }

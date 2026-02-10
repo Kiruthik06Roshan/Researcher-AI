@@ -1,0 +1,298 @@
+/* Core Navigator Styles */
+
+/* Toggle Button */
+.core-navigator-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--secondary-neon), var(--primary-neon));
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.core-navigator-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(189, 0, 255, 0.6);
+}
+
+/* Chat Window */
+.core-navigator-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: rgba(10, 10, 18, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    transform-origin: bottom right;
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.core-navigator-window.open {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+    bottom: 20px;
+    /* Adjust if toggle button disappears or stays */
+}
+
+/* Header */
+.cn-header {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-glass);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cn-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.cn-icon-bot {
+    color: var(--primary-neon);
+}
+
+.cn-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cn-close-btn:hover {
+    color: white;
+}
+
+/* Messages */
+.cn-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+}
+
+.cn-welcome {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.cn-welcome-icon {
+    color: var(--secondary-neon);
+    opacity: 0.8;
+}
+
+.cn-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.cn-message {
+    display: flex;
+    gap: 10px;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+}
+
+.cn-message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.cn-message.assistant {
+    align-self: flex-start;
+}
+
+.cn-avatar {
+    min-width: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.cn-message.user .cn-avatar {
+    background: rgba(0, 242, 255, 0.1);
+    color: var(--primary-neon);
+}
+
+.cn-message.assistant .cn-avatar {
+    background: rgba(189, 0, 255, 0.1);
+    color: var(--secondary-neon);
+}
+
+.cn-content {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.cn-message.user .cn-content {
+    background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(0, 242, 255, 0.05));
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    color: var(--text-primary);
+    border-top-right-radius: 2px;
+}
+
+.cn-message.assistant .cn-content {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    border-top-left-radius: 2px;
+}
+
+/* Typing Indicator */
+.typing {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px !important;
+    align-items: center;
+}
+
+.typing span {
+    width: 6px;
+    height: 6px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Area */
+.cn-input-area {
+    padding: 16px;
+    border-top: 1px solid var(--border-glass);
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 10px;
+}
+
+.cn-input-area input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    padding: 10px 16px;
+    color: white;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.cn-input-area input:focus {
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.cn-input-area button {
+    background: linear-gradient(135deg, var(--secondary-neon), var(--primary-neon));
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.cn-input-area button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(189, 0, 255, 0.4);
+}
+
+.cn-input-area button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--text-muted);
+}
+
+.cn-error {
+    margin: 8px 0;
+    padding: 10px;
+    background: rgba(255, 50, 50, 0.1);
+    border: 1px solid rgba(255, 50, 50, 0.3);
+    border-radius: 8px;
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    text-align: center;
+}
